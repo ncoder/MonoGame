@@ -64,7 +64,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		public static readonly BlendState AlphaBlend;
 		public static readonly BlendState NonPremultiplied;
 		public static readonly BlendState Opaque;
-		
+        public static readonly BlendState Multiply;
+        public static readonly BlendState Multiplyx2;
+
 		static BlendState () {
 			Additive = new BlendState () {
 				ColorSourceBlend = Blend.SourceAlpha,
@@ -93,7 +95,21 @@ namespace Microsoft.Xna.Framework.Graphics
 				ColorDestinationBlend = Blend.Zero,
 				AlphaDestinationBlend = Blend.Zero
 			};
-		}				
+
+            Multiply = new BlendState () {
+                ColorSourceBlend = Blend.DestinationColor,
+                AlphaSourceBlend = Blend.DestinationColor,               
+                ColorDestinationBlend = Blend.Zero,
+                AlphaDestinationBlend = Blend.Zero
+            };
+
+            Multiplyx2 = new BlendState () {
+                ColorSourceBlend = Blend.DestinationColor,
+                AlphaSourceBlend = Blend.DestinationColor,               
+                ColorDestinationBlend = Blend.SourceColor,
+                AlphaDestinationBlend = Blend.SourceColor
+            };
+        }				
 	}
 }
 
