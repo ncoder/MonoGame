@@ -38,6 +38,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			
             GLStateManager.Projection(Projection);
             GLStateManager.WorldView(World, View);
+            
+            // this should probably not be here.
+            // this should probably be set immediately on assignment.
+            GLStateManager.Cull(this.graphicsDevice.RasterizerState.CullMode);
 
 			base.Apply();
             
