@@ -36,6 +36,9 @@ or conditions. You may have additional consumer rights under your local laws whi
 permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
 purpose and non-infringement.
 */
+using System.Diagnostics;
+
+
 #endregion License
 
 using System;
@@ -120,7 +123,9 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
-        public T Load<T>(string assetName)
+
+        // tries to load asset. Looks to see if asset was pre-loaded in memory first.
+        public T Load<T>(string assetName, int lod = 0)
         {
             if (string.IsNullOrEmpty(assetName))
             {
@@ -141,39 +146,18 @@ namespace Microsoft.Xna.Framework.Content
                 }
             }
 
-            asset = ReadAsset<T>(assetName, null);
+            asset = ReadAsset<T>(assetName, null, lod);
             return (T)asset;
         }
 
-        protected T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject)
+        protected string GetRealFilename<T>(string assetName)
         {
-            if (string.IsNullOrEmpty(assetName))
-            {
-                throw new ArgumentNullException("assetName");
-            }
-            if (disposed)
-            {
-                throw new ObjectDisposedException("ContentManager");
-            }
-
-            string originalAssetName = assetName;
-            object result = null;
-
-            if (this.graphicsDeviceService == null)
-            {
-                this.graphicsDeviceService = serviceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
-                if (this.graphicsDeviceService == null)
-                {
-                    throw new InvalidOperationException("No Graphics Device Service");
-                }
-            }
-
-            // Replace Windows path separators with local path separators
+           // Replace Windows path separators with local path separators
             assetName = GetFilename(assetName);
 
             // Get the real file name
             if ((typeof(T) == typeof(Curve))) 
-            {				
+            {               
                 assetName = CurveReader.Normalize(assetName);
             }
             else if ((typeof(T) == typeof(Texture2D)))
@@ -200,6 +184,40 @@ namespace Microsoft.Xna.Framework.Content
             {
                 assetName = Video.Normalize(assetName);
             }
+
+            return assetName;
+        }
+
+
+        protected T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject, int lod = 0)
+        {
+            if (string.IsNullOrEmpty(assetName))
+            {
+                throw new ArgumentNullException("assetName");
+            }
+            if (disposed)
+            {
+                throw new ObjectDisposedException("ContentManager");
+            }
+
+            //GC.GetTotalMemory(true);
+            //Process currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+            //long memstart = currentProcess.WorkingSet64;
+
+            string originalAssetName = assetName;
+            object result = null;
+
+            if (this.graphicsDeviceService == null)
+            {
+                this.graphicsDeviceService = serviceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
+                if (this.graphicsDeviceService == null)
+                {
+                    throw new InvalidOperationException("No Graphics Device Service");
+                }
+            }
+
+            // Replace Windows path separators with local path separators
+            assetName = GetRealFilename<T>(assetName);
 
             if (string.IsNullOrEmpty(assetName))
             {
@@ -329,7 +347,7 @@ namespace Microsoft.Xna.Framework.Content
                 {
                     using (Stream assetStream = OpenStream(assetName))
                     {
-                        Texture2D texture = Texture2D.FromFile(graphicsDeviceService.GraphicsDevice, assetStream);
+                        Texture2D texture = Texture2D.FromFile(graphicsDeviceService.GraphicsDevice, assetStream, lod);
                         texture.Name = originalAssetName;
                         result = texture;
                     }

@@ -105,6 +105,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 return _bounds;
             }
         }
+
+        public void AdjustScale(float factor)
+        {
+            texture.Initialize(1.0f/factor);
+            _width = (int)(texture.ImageWidth * factor);
+            _height = (int)(texture.ImageHeight * factor);
+        }
+
+        public float GetScale ()
+        {
+            return (float)_width / texture.ImageWidth;
+        }
 		
 		internal Texture2D(GraphicsDevice graphicsDevice, ESImage theImage)
 		{
@@ -245,7 +257,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			return result;
         }
 
-        public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream)
+        public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream, int lod=0)
         {
             MonoTouch.Foundation.NSData nsData = MonoTouch.Foundation.NSData.FromStream(textureStream);
 
@@ -256,15 +268,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ContentLoadException("Error loading Texture2D Stream");
 			}
 			
-			ESImage theTexture = new ESImage(image, graphicsDevice.PreferedFilter);			
+			ESImage theTexture = new ESImage(image, 1.0f, lod, graphicsDevice.PreferedFilter);			
 			Texture2D result = new Texture2D(graphicsDevice, theTexture);
 			
 			return result;
-        }
-
-        public static Texture2D FromFile(GraphicsDevice graphicsDevice, Stream textureStream, int numberBytes)
-        {
-            throw new NotImplementedException();
         }
 
         public static Texture2D FromFile(GraphicsDevice graphicsDevice, string filename, int width, int height)

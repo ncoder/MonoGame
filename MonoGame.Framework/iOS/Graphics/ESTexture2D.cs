@@ -65,17 +65,17 @@ namespace Microsoft.Xna.Framework.Graphics
 			InitWithData(data,pixelFormat,width,height,size, filter);
 		}
 		
-		public ESTexture2D(UIImage uiImage, All filter)
+		public ESTexture2D(UIImage uiImage, All filter, int lod = 0)
 		{
-			InitWithCGImage(uiImage.CGImage,filter);
+			InitWithCGImage(uiImage.CGImage,filter, lod);
 		}
 		
-		public ESTexture2D(CGImage cgImage, All filter)
+		public ESTexture2D(CGImage cgImage, All filter, int lod = 0)
 		{
-			InitWithCGImage(cgImage,filter);
+			InitWithCGImage(cgImage,filter, lod);
 		}
 		
-		private void InitWithCGImage(CGImage image, All filter)
+		private void InitWithCGImage(CGImage image, All filter, int lod = 0)
 		{
 			int	width,height,i;
 	        CGContext context = null;
@@ -124,13 +124,16 @@ namespace Microsoft.Xna.Framework.Graphics
 				height = i;
 			}
 			// TODO: kMaxTextureSize = 1024
-			while((width > 1024) || (height > 1024)) 
+            var scale = 1.0f;
+			while((width > 2048) || (height > 2048) || lod > 0) 
 			{
 				width /= 2;
 				height /= 2;
-				transform = CGAffineTransform.MakeScale(0.5f,0.5f);
+                scale /= 2.0f;
+                transform = CGAffineTransform.MakeScale(scale,scale);
 				imageSize.Width /= 2;
 				imageSize.Height /= 2;
+                lod--;
 			}
 			
 			switch(pixelFormat) 
@@ -149,6 +152,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					throw new NotSupportedException("Invalid pixel format"); 
 			}
 				
+
 			context.ClearRect(new RectangleF(0,0,width,height));
  			context.TranslateCTM(0, height - imageSize.Height);
 			

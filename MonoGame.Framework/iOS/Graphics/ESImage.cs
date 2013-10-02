@@ -89,7 +89,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			textureOffsetY = 0;
 		}
 		
-		private void Initialize( float scale )
+		public void Initialize( float scale )
 		{
 			imageWidth = texture.ContentSize.Width;
 			imageHeight = texture.ContentSize.Height;
@@ -118,12 +118,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			Initialize(1.0f);			
 		}
 
-		public ESImage(UIImage image, All filter) : this(image, 1.0f, filter)
+		public ESImage(UIImage image, All filter) : this(image, 1.0f, 0, filter)
 		{ }
 		
-		public ESImage(UIImage image, float imageScale, All filter)
+		public ESImage(UIImage image, float imageScale, int lod, All filter)
 		{
-			texture = new ESTexture2D(image,filter);
+			texture = new ESTexture2D(image,filter, lod);
 			Initialize(imageScale);
 		}
 		
