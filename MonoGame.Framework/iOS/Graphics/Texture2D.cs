@@ -66,17 +66,25 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		internal bool IsSpriteFontTexture {get;set;}
 		
+#if RESOURCE_TRACKERS
+        public long lastUsed;
+
+#endif
+
 		// my change
 		// --------
 		internal uint ID
 		{
 			get
 			{ 
-				if (texture == null)
+#if RESOURCE_TRACKERS
+                lastUsed = DateTime.Now.Ticks;
+#endif
+                if (texture == null)
 					return (uint)_textureId;
 				else
 					return texture.Name;
-				
+	            
 			}
 		}
 		// --------
