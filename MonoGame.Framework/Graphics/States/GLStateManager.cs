@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private static GLStateEnabled _depthTest;
         private static All11 _blendFuncSource;
         private static All11 _blendFuncDest;
-        private static All11 _cull = All11.Ccw; // default
+        private static CullMode _cull = CullMode.CullClockwiseFace; // default
 
         public static void TextureCoordArray(bool enable)
         {
@@ -92,12 +92,28 @@ namespace Microsoft.Xna.Framework.Graphics
             //GL11.Ortho(0, _device.DisplayMode.Width, _device.DisplayMode.Height, 0, -1, 1);
         }
 
-        public static void Cull(All11 cullMode)
+        public static void Cull(CullMode cullMode)
         {
             if (_cull != cullMode)
             {
+                switch(cullMode)
+                {
+                case CullMode.CullClockwiseFace:
+                    GL11.FrontFace(All11.Ccw); 
+                    GL11.CullFace(All11.Back); 
+                    GL11.Enable(All11.CullFace);
+                    break;
+                case CullMode.CullCounterClockwiseFace:
+                    GL11.FrontFace(All11.Cw);
+                    GL11.CullFace(All11.Back);
+                    GL11.Enable(All11.CullFace);
+                    break;
+                case CullMode.None:
+                    GL11.Disable(All11.CullFace);
+                    break;
+                    
+                }
                 _cull = cullMode;
-                GL11.Enable(_cull);
             }
         }
 

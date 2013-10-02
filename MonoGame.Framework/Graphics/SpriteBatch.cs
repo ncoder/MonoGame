@@ -300,7 +300,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL20.BlendEquation(ALL20.FuncAdd);
 			}
 
-			//CullMode
+            //CullMode
+            // consider using GLStateManager here.
 			GL20.FrontFace(ALL20.Cw);
 			GL20.Enable(ALL20.CullFace);
 			
@@ -456,9 +457,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL11.EnableClientState(ALL11.ColorArray);
 			GL11.EnableClientState(ALL11.TextureCoordArray);
 			
-			// Enable Culling for better performance
-			GL11.Enable(ALL11.CullFace);
-			GL11.FrontFace(ALL11.Cw);
+			// No need to cull sprites. they will all be same-facing by construction.
+            // Plus, setting frontface to Clockwise is a troll move.
+            GLStateManager.Cull(CullMode.None);
 			GL11.Color4(1.0f, 1.0f, 1.0f, 1.0f);						
 			
 			_batcher.DrawBatchGL11(_sortMode, _samplerState);
@@ -468,8 +469,8 @@ namespace Microsoft.Xna.Framework.Graphics
                GL11.Disable(ALL11.ScissorTest);
             }
 		}
-		
-		public void Draw 
+        
+        public void Draw 
 			( 
 			 Texture2D texture,
 			 Vector2 position,
