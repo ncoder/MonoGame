@@ -36,6 +36,9 @@ or conditions. You may have additional consumer rights under your local laws whi
 permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
 purpose and non-infringement.
 */
+using System.Globalization;
+
+
 #endregion License
 
 #region Statement
@@ -86,7 +89,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					osVersion = parts[0] + "." + parts[1];
 				}
 				
-				if (double.Parse(osVersion) > 4.1)
+                if (double.Parse(osVersion, CultureInfo.InvariantCulture) > 4.1)
 				{
 					
 					lp = GKLocalPlayer.LocalPlayer;
