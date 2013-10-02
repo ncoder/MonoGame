@@ -346,8 +346,20 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				GL11.BlendFunc(ALL11.SrcAlpha,ALL11.One);
 				GL11.Enable(ALL11.Blend);	
-			}			
-			
+			}
+            
+            if( _blendState == BlendState.Multiply )
+            {
+                GL11.BlendFunc(ALL11.DstColor, ALL11.Zero);
+                GL11.Enable(ALL11.Blend);
+            }
+
+            if( _blendState == BlendState.Multiplyx2 )
+            {
+                GL11.BlendFunc(ALL11.DstColor, ALL11.SrcColor);
+                GL11.Enable(ALL11.Blend);
+            }
+
 			// set camera
 			GL11.MatrixMode(ALL11.Projection);
 			GL11.LoadIdentity();							
