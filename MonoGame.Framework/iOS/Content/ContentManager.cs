@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Content
 {
     public partial class ContentManager
     {
-        string GetFilename(string assetName)
+        protected string GetFilename(string assetName)
         {
             // Replace Windows path separators with local path separators
             return Path.Combine(_rootDirectory, assetName.Replace('\\', Path.DirectorySeparatorChar));
