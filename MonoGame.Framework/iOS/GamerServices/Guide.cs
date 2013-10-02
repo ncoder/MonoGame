@@ -463,6 +463,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		
 		public static void ShowMatchMaker()
 		{
+            /* commented out due to change to GKMatchmakerViewController
 			if ( ( Gamer.SignedInGamers.Count > 0 ) && ( Gamer.SignedInGamers[0].IsSignedInToLive ) )
 			{
 				// Lazy load it
@@ -508,7 +509,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 						isVisible = true;
 					}				
 			    }
-			}
+			}*/
 		}
 
 		public static IAsyncResult BeginShowStorageDeviceSelector( AsyncCallback callback, object state )
