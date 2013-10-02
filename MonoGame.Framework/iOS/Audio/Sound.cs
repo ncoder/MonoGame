@@ -165,10 +165,11 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Play()
 		{
-            ThreadPool.QueueUserWorkItem(delegate
-            {
+            //ThreadPool.QueueUserWorkItem(delegate
+            //{
+                _audioPlayer.CurrentTime = 0;
                 _audioPlayer.Play();
-            });
+            //});
 		}
 		
 		public void Resume()
