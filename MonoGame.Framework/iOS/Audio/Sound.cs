@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Audio
 			
 			if (!_audioPlayer.PrepareToPlay())
 			{
-				throw new Exception("Unable to Prepare sound for playback!");
+                Console.WriteLine("Unable to Prepare sound for playback!" + url);
 			}
 		}
 		
@@ -82,7 +82,7 @@ namespace Microsoft.Xna.Framework.Audio
 			
 			if (!_audioPlayer.PrepareToPlay())
 			{
-				throw new Exception("Unable to Prepare sound for playback!");
+                Console.WriteLine("Unable to Prepare sound for playback!");
 			}
 		}
 		
