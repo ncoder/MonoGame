@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework
 		
 		public override string ToString ()
 		{
-			return string.Format("[{0}({1}%)\t HitCount={2}\t TotalTime={3}ms\t MaxTime={4}ms\t Variance={5:F2}ms^2 AverageTime={6}ms]", Name,(100*TotalTime)/PerformanceCounter.ElapsedTime,HitCount,TotalTime, MaxTime, SqrDiffSum/HitCount, TotalTime/HitCount);
+            return string.Format("[{0}({1}%)\t HitCount={2}\t TotalTime={3}ms\t MaxTime={4}ms(at:{7})\t Variance={5:F2}ms^2 AverageTime={6}ms]", Name,(100*TotalTime)/PerformanceCounter.ElapsedTime,HitCount,TotalTime, MaxTime, SqrDiffSum/HitCount, TotalTime/HitCount, MaxAt);
 		}
 
 		public long PreviousTime {get;set;}
@@ -65,6 +65,7 @@ namespace Microsoft.Xna.Framework
 		public double SqrDiffSum {get; set;} // used for approximation of variance.
 		public long HitCount {get;set;}
 		public string Name {get;set;}
+        public long MaxAt {get; set;}
 	}
 	
 	internal class PerformanceEvent
@@ -122,6 +123,14 @@ namespace Microsoft.Xna.Framework
 			Console.WriteLine("=========================");
 			Console.WriteLine("Memory: " + GC.GetTotalMemory(false).ToString());
 		}
+        
+        
+        public static void Clear()
+        {
+            _events.Clear();
+            _list.Clear ();
+            
+        }
 		
 		[Conditional("PERF_COUNTERS")]
 		public static void Begin()
@@ -163,11 +172,14 @@ namespace Microsoft.Xna.Framework
 		[Conditional("PERF_COUNTERS")]
 		public static void EndMensure(string Name)
 		{
+            if(!_list.ContainsKey(Name))
+                return;
 			PerformanceItem item = _list[Name];
 			long elapsedTime = Environment.TickCount - item.PreviousTime;
 			if (item.MaxTime < elapsedTime) 
 			{
 				item.MaxTime = elapsedTime;
+                item.MaxAt = item.HitCount;
 			}
 			item.HitCount ++;
 			item.TotalTime += elapsedTime;
