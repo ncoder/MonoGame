@@ -39,7 +39,6 @@
 // #endregion License
 // 
 using System;
-using System.Linq;
 
 namespace Microsoft.Xna.Framework.Input
 {
@@ -78,7 +77,11 @@ namespace Microsoft.Xna.Framework.Input
 		public bool IsKeyDown (Keys key)
 		{
 			if (_keys != null) {
-				return _keys.Contains(key);
+                foreach(var k in _keys)
+                {
+                    if(k == key)
+                        return true;
+                }
 			}
 			return false;
 		}
@@ -87,7 +90,11 @@ namespace Microsoft.Xna.Framework.Input
 		{
 			if (_keys != null) 
 			{
-				return !_keys.Contains(key);
+                foreach(var k in _keys)
+                {
+                    if(k == key)
+                        return false;
+                }
 			}
 			return true;
 		}
