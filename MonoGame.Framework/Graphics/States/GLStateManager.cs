@@ -72,6 +72,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL11.Disable(All11.DepthTest);
         }
 
+        public static void Color(float r, float g, float b, float a)
+        {
+            GL11.Color4(r, g, b, a);
+        }
+
         public static void Blend(bool enable)
         {
             GL11.Enable(All11.Blend);
