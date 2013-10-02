@@ -109,6 +109,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 					case TouchLocationState.Released:
 						aux.Add(t);
 					break;
+                    case TouchLocationState.Invalid:
+                        aux.Add (t);
+                    break;
 				}
 			}
 			foreach(TouchLocation touch in aux)
