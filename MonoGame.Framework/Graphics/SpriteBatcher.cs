@@ -55,9 +55,8 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 		private const int InitialBatchSize = 256;
 		private const int InitialVertexArraySize = 256;
-		List<SpriteBatchItem> _batchItemList;
-		Queue<SpriteBatchItem> _freeBatchItemQueue;
-		VertexPosition2ColorTexture[] _vertexArray;
+		BetterList<SpriteBatchItem> _batchItemList; // use our own list just so that we can get access to internals.
+		public BetterList<VertexPosition2ColorTexture> _vertexArray; // carefull with this.
 		ushort[] _index;
 		GCHandle _vertexHandle;
 		GCHandle _indexHandle;
@@ -69,12 +68,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public SpriteBatcher ()
 		{
-			_batchItemList = new List<SpriteBatchItem>(InitialBatchSize);
-			_freeBatchItemQueue = new Queue<SpriteBatchItem>(InitialBatchSize);
+			_batchItemList = new BetterList<SpriteBatchItem>();
+            _vertexArray = new BetterList<VertexPosition2ColorTexture>();
+            _vertexArray.resizeCallback = UnlinkVertexArray;// frees our Pin every time the allocated size changes. (we re-link when necessary on end)
 
-			_vertexArray = new VertexPosition2ColorTexture[4*InitialVertexArraySize];
 			_index = new ushort[6*InitialVertexArraySize];
-			_vertexHandle = GCHandle.Alloc(_vertexArray,GCHandleType.Pinned);
 			_indexHandle = GCHandle.Alloc(_index,GCHandleType.Pinned);
 			
 			for ( int i = 0; i < InitialVertexArraySize; i++ )
@@ -89,16 +87,85 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 		}
 		
-		public SpriteBatchItem CreateBatchItem()
+		private SpriteBatchItem CreateBatchItem(Color Tint, int texId, float Depth)
 		{
-			SpriteBatchItem item;
-			if ( _freeBatchItemQueue.Count > 0 )
-				item = _freeBatchItemQueue.Dequeue();
-			else
-				item = new SpriteBatchItem();
-			_batchItemList.Add(item);
-			return item;
+            // allocate 4 vertices for this quad, and set the batch pointer to the right offset.
+			var bi = new SpriteBatchItem() { Tint = Tint, TextureID = texId, Depth = Depth, VertexBase = _vertexArray.Count };
+            _vertexArray.AddN(4); 
+            
+            return bi;
 		}
+        
+        public void AddBatchItem ( int texId, float depth, float x, float y, float w, float h, Color color, Vector2 texCoordTL, Vector2 texCoordBR )
+        {
+            var item = CreateBatchItem(color, texId, depth);
+            
+            var b = item.VertexBase;
+            _vertexArray.buffer[b].Position.X = x;
+            _vertexArray.buffer[b].Position.Y = y;
+            _vertexArray.buffer[b].Color = color.GLPackedValue;
+            _vertexArray.buffer[b].TextureCoordinate.X = texCoordTL.X;
+            _vertexArray.buffer[b].TextureCoordinate.Y = texCoordTL.Y;
+            
+            b++;
+            _vertexArray.buffer[b].Position.X = x+w;
+            _vertexArray.buffer[b].Position.Y = y;
+            _vertexArray.buffer[b].Color = color.GLPackedValue;
+            _vertexArray.buffer[b].TextureCoordinate.X = texCoordBR.X;
+            _vertexArray.buffer[b].TextureCoordinate.Y = texCoordTL.Y;
+            
+            b++;
+            _vertexArray.buffer[b].Position.X = x;
+            _vertexArray.buffer[b].Position.Y = y+h;
+            _vertexArray.buffer[b].Color = color.GLPackedValue;
+            _vertexArray.buffer[b].TextureCoordinate.X = texCoordTL.X;
+            _vertexArray.buffer[b].TextureCoordinate.Y = texCoordBR.Y;
+            
+            b++;
+            _vertexArray.buffer[b].Position.X = x+w;
+            _vertexArray.buffer[b].Position.Y = y+h;
+            _vertexArray.buffer[b].Color = color.GLPackedValue;
+            _vertexArray.buffer[b].TextureCoordinate.X = texCoordBR.X;
+            _vertexArray.buffer[b].TextureCoordinate.Y = texCoordBR.Y;
+            
+            _batchItemList.Add (item);
+        }
+        
+        public void AddBatchItem ( int texId, float depth, float x, float y, float dx, float dy, float w, float h, float sin, float cos, Color color, Vector2 texCoordTL, Vector2 texCoordBR )
+        {
+            var item = CreateBatchItem(color, texId, depth);
+            var b = item.VertexBase;
+            
+            _vertexArray.buffer[b].Position.X = x+dx*cos-dy*sin;
+            _vertexArray.buffer[b].Position.Y = y+dx*sin+dy*cos;
+            _vertexArray.buffer[b].Color = color.GLPackedValue;
+            _vertexArray.buffer[b].TextureCoordinate.X = texCoordTL.X;
+            _vertexArray.buffer[b].TextureCoordinate.Y = texCoordTL.Y;
+            
+            b++;
+            _vertexArray.buffer[b].Position.X = x+(dx+w)*cos-dy*sin;
+            _vertexArray.buffer[b].Position.Y = y+(dx+w)*sin+dy*cos;
+            _vertexArray.buffer[b].Color = color.GLPackedValue;
+            _vertexArray.buffer[b].TextureCoordinate.X = texCoordBR.X;
+            _vertexArray.buffer[b].TextureCoordinate.Y = texCoordTL.Y;
+            
+            b++;
+            _vertexArray.buffer[b].Position.X = x+dx*cos-(dy+h)*sin;
+            _vertexArray.buffer[b].Position.Y = y+dx*sin+(dy+h)*cos;
+            _vertexArray.buffer[b].Color = color.GLPackedValue;
+            _vertexArray.buffer[b].TextureCoordinate.X = texCoordTL.X;
+            _vertexArray.buffer[b].TextureCoordinate.Y = texCoordBR.Y;
+            
+            b++;
+            _vertexArray.buffer[b].Position.X = x+(dx+w)*cos-(dy+h)*sin;
+            _vertexArray.buffer[b].Position.Y = y+(dx+w)*sin+(dy+h)*cos;
+            _vertexArray.buffer[b].Color = color.GLPackedValue;
+            _vertexArray.buffer[b].TextureCoordinate.X = texCoordBR.X;
+            _vertexArray.buffer[b].TextureCoordinate.Y = texCoordBR.Y;
+            
+            _batchItemList.Add (item);
+        }        
+            
 		
 		int CompareTexture ( SpriteBatchItem a, SpriteBatchItem b )
 		{
@@ -125,20 +192,27 @@ namespace Microsoft.Xna.Framework.Graphics
 			switch ( sortMode )
 			{
 			case SpriteSortMode.Texture :
-				_batchItemList.Sort( CompareTexture );
-				break;
+				//_batchItemList.Sort( CompareTexture );
+                throw new NotSupportedException();
 			case SpriteSortMode.FrontToBack :
-				_batchItemList.Sort ( CompareDepth );
-				break;
+				//_batchItemList.Sort ( CompareDepth );
+                throw new NotSupportedException();
 			case SpriteSortMode.BackToFront :
-				_batchItemList.Sort ( CompareReverseDepth );
-				break;
+				//_batchItemList.Sort ( CompareReverseDepth );
+                throw new NotSupportedException();
 			}
 			
 			GL20.EnableVertexAttribArray(attributePosition);
 			GL20.EnableVertexAttribArray(attributeTexCoord);
 			
-			int size = VertexPosition2ColorTexture.GetSize();
+            // make sure the vertexArray has enough space
+            if ( _batchItemList.Count*4 > _index.Length )
+                ExpandIndexArray( _batchItemList.Count );
+            
+            LinkVertexArray();
+
+            
+            int size = VertexPosition2ColorTexture.GetSize();
 			GL20.VertexAttribPointer(attributePosition,2,ALL20.Float,false,size,_vertexHandle.AddrOfPinnedObject());
 			GL20.VertexAttribPointer(attributeTexCoord,2,ALL20.Float,false,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2+sizeof(uint))));
 
@@ -148,10 +222,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			int texID = -1;
 			Color lastTint =  new Color(0.0f,0.0f,0.0f,0.0f);
 
-			// make sure the vertexArray has enough space
-			if ( _batchItemList.Count*4 > _vertexArray.Length )
-				ExpandVertexArray( _batchItemList.Count );
-			
+            
+            
 			foreach ( SpriteBatchItem item in _batchItemList )
 			{
 				//Tint Color
@@ -171,18 +243,13 @@ namespace Microsoft.Xna.Framework.Graphics
 					GL20.Uniform1(texID, 0);
 					GL20.VertexAttrib4(attributeTint,vtint.X, vtint.Y, vtint.Z, vtint.W);
 				}
-				// store the SpriteBatchItem data in our vertexArray
-				_vertexArray[index++] = item.vertexTL;
-				_vertexArray[index++] = item.vertexTR;
-				_vertexArray[index++] = item.vertexBL;
-				_vertexArray[index++] = item.vertexBR;
-				
-				_freeBatchItemQueue.Enqueue ( item );
+                index += 4;
 			}
 			// flush the remaining vertexArray data
 			FlushVertexArrayGL20(startIndex, index);
 			
 			_batchItemList.Clear();
+            _vertexArray.Clear ();
 		}
 		
 		public void DrawBatchGL11 ( SpriteSortMode sortMode, SamplerState samplerState )
@@ -195,20 +262,26 @@ namespace Microsoft.Xna.Framework.Graphics
 			switch ( sortMode )
 			{
 			case SpriteSortMode.Texture :
-				_batchItemList.Sort( CompareTexture );
-				break;
+                throw new NotSupportedException();
+				//_batchItemList.Sort( CompareTexture );
 			case SpriteSortMode.FrontToBack :
-				_batchItemList.Sort ( CompareDepth );
-				break;
+                throw new NotSupportedException();
+				//_batchItemList.Sort ( CompareDepth );
 			case SpriteSortMode.BackToFront :
-				_batchItemList.Sort ( CompareReverseDepth );
-				break;
+                throw new NotSupportedException();
+				//_batchItemList.Sort ( CompareReverseDepth );
 			}
 			
 			// make sure an old draw isn't still going on.
 			// cross fingers, commenting this out!!
 			//GL.Flush();
-			
+
+            // make sure the vertexArray has enough space
+            if ( _batchItemList.Count*6 > _index.Length )
+                ExpandIndexArray( _batchItemList.Count );
+            
+            LinkVertexArray();
+            
 			int size = sizeof(float)*4+sizeof(uint);
 			GL11.VertexPointer(2,ALL11.Float,size,_vertexHandle.AddrOfPinnedObject() );
 			GL11.ColorPointer(4, ALL11.UnsignedByte,size,(IntPtr)((uint)_vertexHandle.AddrOfPinnedObject()+(uint)(sizeof(float)*2)));
@@ -219,9 +292,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			int index = 0;
 			int texID = -1;
 
-			// make sure the vertexArray has enough space
-			if ( _batchItemList.Count*4 > _vertexArray.Length )
-				ExpandVertexArray( _batchItemList.Count );
 			
 			foreach ( SpriteBatchItem item in _batchItemList )
 			{
@@ -236,33 +306,29 @@ namespace Microsoft.Xna.Framework.Graphics
 					samplerState.Activate();
 				}
 				// store the SpriteBatchItem data in our vertexArray
-				_vertexArray[index++] = item.vertexTL;
-				_vertexArray[index++] = item.vertexTR;
-				_vertexArray[index++] = item.vertexBL;
-				_vertexArray[index++] = item.vertexBR;
-				
-				_freeBatchItemQueue.Enqueue ( item );
+				index += 4;
 			}
 			// flush the remaining vertexArray data
 			FlushVertexArrayGL11(startIndex, index);
 			
 			_batchItemList.Clear();
+            _vertexArray.Clear();
 		}
 		
-		void ExpandVertexArray( int batchSize )
+		void ExpandIndexArray( int batchSize )
 		{
 			// increase the size of the vertexArray
-			int newCount = _vertexArray.Length / 4;
+			int newCount = _index.Length / 6;
 			
-			while ( batchSize*4 > newCount )
+			while ( batchSize > newCount )
 				newCount += 128;
 			
-			_vertexHandle.Free();			
-			_indexHandle.Free();			
-			
-			_vertexArray = new VertexPosition2ColorTexture[4*newCount];
+            if(_indexHandle.IsAllocated)
+            {
+			    _indexHandle.Free();			
+            }
+			    
 			_index = new ushort[6*newCount];
-			_vertexHandle = GCHandle.Alloc(_vertexArray,GCHandleType.Pinned);
 			_indexHandle = GCHandle.Alloc(_index,GCHandleType.Pinned);
 			
 			for ( int i = 0; i < newCount; i++ )
@@ -275,6 +341,23 @@ namespace Microsoft.Xna.Framework.Graphics
 				_index[i*6+5] = (ushort)(i*4+2);
 			}
 		}
+        
+        void LinkVertexArray()
+        {
+            if(!_vertexHandle.IsAllocated)
+            {
+                _vertexHandle = GCHandle.Alloc(_vertexArray.buffer,GCHandleType.Pinned);
+            }
+        }
+        
+        void UnlinkVertexArray()
+        {
+            if(_vertexHandle.IsAllocated)
+            {
+                _vertexHandle.Free();
+            }
+        }
+        
 		void FlushVertexArrayGL11 ( int start, int end )
 		{
 			// draw stuff

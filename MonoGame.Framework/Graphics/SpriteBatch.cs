@@ -487,11 +487,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentException("texture");
 			}
 			
-			SpriteBatchItem item = _batcher.CreateBatchItem();
-			
-			item.Depth = depth;
-			item.TextureID = (int) texture.ID;
-				
 			if ( sourceRectangle.HasValue)
 			{
 				tempRect = sourceRectangle.Value;
@@ -536,8 +531,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				texCoordTL.X = temp;
 			}
 			
-			item.Set
-				(
+			_batcher.AddBatchItem (
+                 (int) texture.ID,
+                 depth,
 				 position.X,
 				 position.Y,
 				 -origin.X*scale.X,
@@ -570,11 +566,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentException("texture");
 			}
 			
-			SpriteBatchItem item = _batcher.CreateBatchItem();
-			
-			item.Depth = depth;
-			item.TextureID = (int) texture.ID;
-						
 			if ( sourceRectangle.HasValue)
 			{
 				tempRect = sourceRectangle.Value;
@@ -618,8 +609,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				texCoordBR.X = texCoordTL.X;
 				texCoordTL.X = temp;
 			}
-			item.Set
-				(
+            _batcher.AddBatchItem (
+                 (int) texture.ID,
+                 depth,
 				 position.X,
 				 position.Y,
 				 -origin.X*scale,
@@ -632,6 +624,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				 texCoordTL,
 				 texCoordBR
 				 );
+            
 		}
 		
 		public void Draw (
@@ -650,11 +643,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentException("texture");
 			}
 			
-			SpriteBatchItem item = _batcher.CreateBatchItem();
-			
-			item.Depth = depth;
-			item.TextureID = (int) texture.ID;
-						
 			if ( sourceRectangle.HasValue)
 			{
 				tempRect = sourceRectangle.Value;
@@ -699,8 +687,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				texCoordTL.X = temp;
 			}
 			
-			item.Set 
-				( 
+            _batcher.AddBatchItem (
+                 (int) texture.ID,
+                 depth,
 				 destinationRectangle.X, 
 				 destinationRectangle.Y, 
 				 -origin.X, 
@@ -711,7 +700,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				 (float)Math.Cos(rotation),
 				 color,
 				 texCoordTL,
-				 texCoordBR );			
+				 texCoordBR );	
+            
 		}
 		
         public void Draw(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color)
@@ -720,11 +710,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				throw new ArgumentException("texture");
 			}
-			
-			SpriteBatchItem item = _batcher.CreateBatchItem();
-			
-			item.Depth = 0.0f;
-			item.TextureID = (int) texture.ID;
 			
 			if ( sourceRectangle.HasValue)
 			{
@@ -759,7 +744,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				texCoordBR.Y = texture.Image.GetTextureCoordY( tempRect.Y+tempRect.Height );
 			}
 			
-			item.Set ( position.X, position.Y, tempRect.Width, tempRect.Height, color, texCoordTL, texCoordBR );
+            _batcher.AddBatchItem (
+                 (int) texture.ID,
+                 0.0f,
+                 position.X, position.Y, tempRect.Width, tempRect.Height, color, texCoordTL, texCoordBR );
 		}
 		
 		public void Draw(Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color)
@@ -768,11 +756,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				throw new ArgumentException("texture");
 			}
-			
-			SpriteBatchItem item = _batcher.CreateBatchItem();
-			
-			item.Depth = 0.0f;
-			item.TextureID = (int) texture.ID;
 			
 			if ( sourceRectangle.HasValue)
 			{
@@ -805,8 +788,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				texCoordBR.Y = texture.Image.GetTextureCoordY( tempRect.Y+tempRect.Height );
 			}
 			
-			item.Set 
-				( 
+            _batcher.AddBatchItem (
+                 (int) texture.ID,
+                 0.0f,
 				 destinationRectangle.X, 
 				 destinationRectangle.Y, 
 				 destinationRectangle.Width, 
@@ -827,11 +811,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				throw new ArgumentException("texture");
 			}
-			
-			SpriteBatchItem item = _batcher.CreateBatchItem();
-			
-			item.Depth = 0;
-			item.TextureID = (int) texture.ID;
 			
 			tempRect.X = 0;
 			tempRect.Y = 0;
@@ -857,8 +836,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				texCoordBR.Y = texture.Image.GetTextureCoordY( tempRect.Y+tempRect.Height );
 			}
 			
-			item.Set 
-				(
+            _batcher.AddBatchItem (
+                 (int) texture.ID,
+                 0.0f,
 				 position.X,
 			     position.Y,
 				 tempRect.Width,
@@ -867,6 +847,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				 texCoordTL,
 				 texCoordBR
 				 );
+            
 		}
 		
 		public void Draw (Texture2D texture, Rectangle rectangle, Color color)
@@ -875,11 +856,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				throw new ArgumentException("texture");
 			}
-			
-			SpriteBatchItem item = _batcher.CreateBatchItem();
-			
-			item.Depth = 0;
-			item.TextureID = (int) texture.ID;
 			
 			tempRect.X = 0;
 			tempRect.Y = 0;
@@ -905,8 +881,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				texCoordBR.Y = texture.Image.GetTextureCoordY( tempRect.Y+tempRect.Height );
 			}
 			
-			item.Set
-				(
+            _batcher.AddBatchItem (
+                 (int) texture.ID,
+                 0.0f,
 				 rectangle.X,
 				 rectangle.Y,
 				 rectangle.Width,
@@ -939,18 +916,14 @@ namespace Microsoft.Xna.Framework.Graphics
 					continue;
                 GlyphData g = spriteFont.characterData[c];
 				
-				SpriteBatchItem item = _batcher.CreateBatchItem();
-				
-				item.Depth = 0.0f;
-				item.TextureID = (int) spriteFont._texture.ID;
-
 				texCoordTL.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X );
 				texCoordTL.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y );
 				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X+g.Glyph.Width );
 				texCoordBR.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y+g.Glyph.Height );
 
-				item.Set
-					(
+                _batcher.AddBatchItem (
+                     (int) spriteFont._texture.ID,
+                     0.0f,
 					 p.X,
 					 p.Y+g.Cropping.Y,
 					 g.Glyph.Width,
@@ -999,11 +972,6 @@ namespace Microsoft.Xna.Framework.Graphics
 					continue;
                 GlyphData g = spriteFont.characterData[c];
 				
-				SpriteBatchItem item = _batcher.CreateBatchItem();
-				
-				item.Depth = depth;
-				item.TextureID = (int) spriteFont._texture.ID;
-
 				texCoordTL.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X );
 				texCoordTL.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y );
 				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X+g.Glyph.Width );
@@ -1022,8 +990,9 @@ namespace Microsoft.Xna.Framework.Graphics
 					texCoordTL.X = temp;
 				}
 				
-				item.Set
-					(
+                _batcher.AddBatchItem (
+                     (int) spriteFont._texture.ID,
+                     depth,
 					 position.X,
 					 position.Y,
 					 p.X*scale,
@@ -1076,11 +1045,6 @@ namespace Microsoft.Xna.Framework.Graphics
 					continue;
                 GlyphData g = spriteFont.characterData[c];
 				
-				SpriteBatchItem item = _batcher.CreateBatchItem();
-				
-				item.Depth = depth;
-				item.TextureID = (int) spriteFont._texture.ID;
-
 				texCoordTL.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X );
 				texCoordTL.Y = spriteFont._texture.Image.GetTextureCoordY( g.Glyph.Y );
 				texCoordBR.X = spriteFont._texture.Image.GetTextureCoordX( g.Glyph.X+g.Glyph.Width );
@@ -1099,8 +1063,9 @@ namespace Microsoft.Xna.Framework.Graphics
 					texCoordTL.X = temp;
 				}
 				
-				item.Set
-					(
+                _batcher.AddBatchItem (
+                     (int) spriteFont._texture.ID,
+                     depth,
 					 position.X,
 					 position.Y,
 					 p.X*scale.X,
