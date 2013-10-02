@@ -40,26 +40,83 @@
 
 #region Using Statements
 using System;
+using OpenTK.Audio.OpenAL;
 #endregion Statements
 
 namespace Microsoft.Xna.Framework.Audio
 {
 	public sealed class SoundEffectInstance : IDisposable
 	{
-		private bool isDisposed = false;
-		private SoundState soundState = SoundState.Stopped;
-		
-		public SoundEffectInstance ()
+		private int source;
+        private SoundEffect sourceInstance;
+		private bool _disposed = true;
+#if RESOURCE_TRACKERS
+        public long lastUsed;
+#endif
+
+		internal SoundEffectInstance(int buffer, SoundEffect parent)
 		{
+            sourceInstance = parent;
+			source = AL.GenSource();
+			var error = AL.GetError();
+			if(error != ALError.NoError)
+			{
+				throw new OpenALException(error, "error creating source.");
+			}
+
+			_disposed = false;
+			AL.Source(source, ALSourcei.Buffer, buffer ); // attach the buffer to a source
 			
+			error = AL.GetError();
+			if(error != ALError.NoError)
+			{
+				throw new OpenALException(error, "error creating source");
+			}
 		}
 		
 		public void Dispose()
 		{
-			_sound.Dispose();
-			isDisposed = true;
-		}
-		
+	        if (!_disposed)
+	        {
+				AL.DeleteSource(source);
+				source = 0;
+
+				// Indicate that the instance has been disposed.
+	            _disposed = true;
+				// managed resource cleanup here.
+
+                var error = AL.GetError();
+                if (error != ALError.NoError)
+                {
+#if DEBUG
+                    throw new OpenALException(error, "borked dispose. ALError: " + error.ToString());
+#else
+                    Console.WriteLine("borked dispose. ALError: " + error.ToString());
+#endif
+                }
+                
+                sourceInstance.UnlinkInstance(this);
+                sourceInstance = null;
+            }
+			
+			GC.SuppressFinalize(this);
+
+        }
+
+        private void CheckError()
+        {
+            var error = AL.GetError();
+            if (error != ALError.NoError)
+            {
+#if DEBUG
+                throw new OpenALException(error, "ALError: " + error.ToString());
+#else
+                Console.WriteLine("ALError: " + error.ToString());
+#endif
+            }
+
+        }
+	
 		public void Apply3D (AudioListener listener, AudioEmitter emitter)
 		{
 			throw new NotImplementedException();
@@ -72,37 +129,33 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Pause ()
 		{
-            if ( _sound != null )
-			{
-				_sound.Pause();
-				soundState = SoundState.Paused;
-			}
+			AL.SourcePause(source);
+            CheckError();
+
 		}
 		
 		public void Play ()
 		{
-			if ( _sound != null )
-			{
-				if (soundState == SoundState.Paused)
-					_sound.Resume();
-				else
-					_sound.Play();
-				soundState = SoundState.Playing;
-			}
+#if RESOURCE_TRACKERS
+            lastUsed = DateTime.Now.Ticks;
+#endif
+
+			AL.SourcePlay(source);
+            CheckError();
+
 		}
 		
 		public void Resume ()
 		{
 			Play();
+
 		}
 		
 		public void Stop ()
 		{
-			if ( _sound != null )
-			{
-				_sound.Stop();
-				soundState = SoundState.Stopped;
-			}
+			AL.SourceStop(source);
+            CheckError();
+
 		}
 		
 		public void Stop (bool immediate)
@@ -114,103 +167,77 @@ namespace Microsoft.Xna.Framework.Audio
 		{ 
 			get
 			{
-				return isDisposed;
+				return _disposed;
 			}
 		}
 		
 		public bool IsLooped 
 		{ 
-			get
-			{
-				if ( _sound != null )
-				{
-					return _sound.Looping;
-				}
-				else
-				{
-					return false;
-				}
-			}
-			
-			set
-			{
-				if ( _sound != null )
-				{
-					if ( _sound.Looping != value )
-					{
-						_sound.Looping = value;
-					}
-				}
-			}
+            get
+            {
+                bool r = false;
+                AL.GetSource(source, ALSourceb.Looping, out r);
+                CheckError();
+
+                return r;
+            }
+            
+            set
+            {
+                AL.Source(source, ALSourceb.Looping, value);
+                CheckError();
+
+            }
 		}
 		
 		public float Pan 
 		{ 
 			get
 			{
-                if ( _sound != null )
-				{
-					return _sound.Pan;
-				}
-				else
-				{
-					return 0.0f;
-				}
+				throw new NotImplementedException();
 			}
 			
 			set
 			{
-                if ( _sound != null )
-				{
-					if ( _sound.Pan != value )
-					{
-						_sound.Pan = value;
-					}
-				}
+				throw new NotImplementedException();
 			}
 		}
 		
-		public float Pitch         
-		{             
-	            get
-	            {
-					if ( _sound != null)
-				    {
-	                   return _sound.Rate;
-				    }
-				    return 0.0f;
-	            }
-	            set
-	            {
-				    if ( _sound != null && _sound.Rate != value)
-				    {
-	                   _sound.Rate = value;
-				    } 
-	            }        
-		 }
-		
-		private Sound _sound;
-		internal Sound Sound 
-		{ 
+		public float Pitch { 
 			get
 			{
-				return _sound;
-			} 
-			
+				float r = 0;
+				AL.GetSource(source, ALSourcef.Pitch, out r);
+                CheckError();
+
+				return (float) (Math.Log(r) / Math.Log(2));
+			}
 			set
 			{
-				_sound = value;
-			} 
+				AL.Source(source, ALSourcef.Pitch, (float) (Math.Pow(2, value)));
+                CheckError();
+
+			}
 		}
 		
 		public SoundState State 
 		{ 
 			get
 			{
-				if (_sound != null && soundState == SoundState.Playing && !_sound.Playing) {
-					soundState = SoundState.Stopped;
-				}
-				return soundState;
+                var state = AL.GetSourceState(source);
+                switch(state)
+                {
+                case ALSourceState.Initial:
+                    return SoundState.Stopped;
+                case ALSourceState.Paused:
+                    return SoundState.Paused;
+                case ALSourceState.Playing:
+                    return SoundState.Playing;
+                case ALSourceState.Stopped:
+                    return SoundState.Stopped;
+                default:
+                    return SoundState.Stopped;                    
+                }
 			} 
 		}
 		
@@ -218,28 +245,17 @@ namespace Microsoft.Xna.Framework.Audio
 		{ 
 			get
 			{
-				if (_sound != null)
-				{
-					return _sound.Volume;
-				}
-				else
-				{
-					return 0.0f;
-				}
+				float r = 0;
+				AL.GetSource(source, ALSourcef.Gain, out r);
+                CheckError();
+				return r;
 			}
 			
 			set
 			{
-				if ( _sound != null )
-				{
-					if ( _sound.Volume != value )
-					{
-						_sound.Volume = value;
-					}
-				}
-			}
-		}	
-		
-		
+                AL.Source(source, ALSourcef.Gain, value);
+                CheckError();
+            }
+		}		
 	}
 }

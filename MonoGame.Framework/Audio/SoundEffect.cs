@@ -40,73 +40,65 @@ purpose and non-infringement.
 ﻿
 using System;
 using System.IO;
+using System.Collections.Generic;
 
 using Microsoft.Xna;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
+using OpenTK.Audio.OpenAL;
+using OpenTK.Audio;
+
 
 namespace Microsoft.Xna.Framework.Audio
 {
     public sealed class SoundEffect : IDisposable
     {
-		private Sound _sound;
+		private int buffer;
 		private string _name = "";
-		private string _filename = "";
-		private byte[] _data;
-		
+        internal List<SoundEffectInstance> attachedInstances = new List<SoundEffectInstance>();
+
 		internal SoundEffect(string fileName)
 		{
-			_filename = fileName;		
-			
-			if (_filename == string.Empty )
+			AudioEngine.EnsureInit();
+
+			buffer = AL.GenBuffer(); 
+		
+			var error = AL.GetError();
+			if (error != ALError.NoError)
 			{
-			  throw new FileNotFoundException("Supported Sound Effect formats are wav, mp3, acc, aiff");
+				throw new OpenALException(error, "borked generation. ALError: " + error.ToString());
 			}
+
+			XRamExtension XRam = new XRamExtension();
+			if (XRam.IsInitialized) 
+				XRam.SetBufferMode(1, ref buffer, XRamExtension.XRamStorage.Hardware); 
 			
-			_sound = new Sound(_filename, 1.0f, false);
+			
+			
+			AudioReader sound = new AudioReader(fileName);
+			var sounddata = sound.ReadToEnd();
+			AL.BufferData(buffer, sounddata.SoundFormat.SampleFormatAsOpenALFormat, sounddata.Data, sounddata.Data.Length, sounddata.SoundFormat.SampleRate);
+			error = AL.GetError();
+			if ( error != ALError.NoError )
+			{
+			   throw new OpenALException(error, "unable to read " + fileName);
+			}			
+			
 			_name = Path.GetFileNameWithoutExtension(fileName);
 		}
 		
 		//SoundEffect from playable audio data
 		internal SoundEffect(string name, byte[] data)
 		{
-			_data = data;
+			throw new NotImplementedException();
 			_name = name;
-			_sound = new Sound(_data, 1.0f, false);
 		}
+		
 		
 		public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
 		{
-			//buffer should contain 16-bit PCM wave data
-			short bitsPerSample = 16;
-			
-			MemoryStream mStream = new MemoryStream(44+buffer.Length);
-			BinaryWriter writer = new BinaryWriter(mStream);
-			
-			writer.Write("RIFF".ToCharArray()); //chunk id
-			writer.Write((int)(36+buffer.Length)); //chunk size
-			writer.Write("WAVE".ToCharArray()); //RIFF type
-			
-			writer.Write("fmt ".ToCharArray()); //chunk id
-			writer.Write((int)16); //format header size
-			writer.Write((short)1); //format (PCM)
-			writer.Write((short)channels);
-			writer.Write((int)sampleRate);
-			short blockAlign = (short)((bitsPerSample/8)*(int)channels);
-			writer.Write((int)(sampleRate*blockAlign)); //byte rate
-			writer.Write((short)blockAlign);
-			writer.Write((short)bitsPerSample);
-			
-			writer.Write("data".ToCharArray()); //chunk id
-			writer.Write((int)buffer.Length); //data size
-			writer.Write(buffer);
-			
-			writer.Close();
-			mStream.Close();
-			
-			_data = mStream.ToArray();
+			throw new NotImplementedException();
 			_name = "";
-			_sound = new Sound(_data, 1.0f, false);
 		}
 		
         public bool Play()
@@ -123,7 +115,7 @@ namespace Microsoft.Xna.Framework.Audio
 				instance.Pitch = pitch;
 				instance.Pan = pan;
 				instance.Play();
-				return instance.Sound.Playing;
+				return true;
 			}
 			return false;
         }
@@ -132,14 +124,8 @@ namespace Microsoft.Xna.Framework.Audio
 		{ 
 			get
 			{
-				if ( _sound != null )
-				{
-					return new TimeSpan(0,0,(int)_sound.Duration);
-				}
-				else
-				{
-					return new TimeSpan(0);
-				}
+				// todo:
+				return new TimeSpan(0);
 			}
 		}
 
@@ -149,23 +135,38 @@ namespace Microsoft.Xna.Framework.Audio
             {
 				return _name;
             }
-			set {
-				_name = value;
-			}
         }
 		
 		public SoundEffectInstance CreateInstance ()
 		{
-			var instance = new SoundEffectInstance();
-			instance.Sound = _sound;
+			var instance = new SoundEffectInstance(buffer, this);
+            attachedInstances.Add (instance);
 			return instance;
 		}
+
+        internal void UnlinkInstance(SoundEffectInstance instance)
+        {
+            attachedInstances.Remove(instance);
+        }
 		
 		#region IDisposable Members
 
         public void Dispose()
         {
-			_sound.Dispose();
+            while(attachedInstances.Count != 0)
+            {
+                attachedInstances[0].Dispose(); // this will come back and call UnlinkInstance, removing items from attachedInstances
+            }
+
+			AL.DeleteBuffer(buffer ); // free previously reserved Handles
+			
+            var error = AL.GetError();
+            if (error != ALError.NoError)
+            {
+                throw new OpenALException(error, "borked dispose. ALError: " + error.ToString());
+            }
+
+			buffer = 0;
         }
 
         #endregion
@@ -182,7 +183,6 @@ namespace Microsoft.Xna.Framework.Audio
 				_masterVolume = value;	
 			}
 		}
-				
     }
 }
 

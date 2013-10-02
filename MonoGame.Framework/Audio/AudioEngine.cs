@@ -39,33 +39,128 @@ purpose and non-infringement.
 #endregion License
 
 using System;
+using OpenTK.Audio;
+using OpenTK.Audio.OpenAL;
 using System.Collections.Generic;
 namespace Microsoft.Xna.Framework.Audio
 {
 	public class AudioEngine : IDisposable
 	{
+		private bool _disposed;
+		private AudioContext ac;
+		
 		public const int ContentVersion = 39;
 		
-		internal Dictionary<string, WaveBank> Wavebanks = new Dictionary<string, WaveBank>();
+		// default auto-initialized currentInstance. 
+		// needs this to fit XNA usage mode with OpenAL.
+		private static AudioEngine currentInstance;
 		
+		internal static AudioEngine CurrentInstance
+		{
+			get 
+			{
+				if(currentInstance == null)
+				{
+					// first instance automatically sets current instance.
+					new AudioEngine(null);
+				}
+				return currentInstance;
+			}
+			
+			set
+			{
+				currentInstance = value;
+			}
+			
+		}
+		
+		internal static void EnsureInit()
+		{
+			var instance = CurrentInstance;	
+			if(instance == null)
+			{
+				throw new Exception("Unknown error");
+			}
+		}
+		
+		
+		private void Init()
+		{
+			ac = new AudioContext();
+			
+			ALError error = AL.GetError();
+			if (error != ALError.NoError)
+			{
+				throw new OpenALException(error, "borked audio context init. ALError: " + error.ToString());
+			}
+
+			_disposed = false;
+			
+/*			Source = AL.GenSource();
+			Buffer = AL.GenBuffer(); 
+			
+			error = AL.GetError();
+			if (error != ALError.NoError)
+			{
+				throw new OpenALException(error, "borked generation. ALError: " + error.ToString());
+			}*/
+			
+			
+			if(currentInstance == null)
+			{
+				currentInstance = this;	
+			}
+		}
+		
+		private void Cleanup()
+		{
+			ac.Dispose();
+			ac = null;
+		}
+		
+		internal Dictionary<string, WaveBank> Wavebanks = new Dictionary<string, WaveBank>();
+ 		
 		public AudioEngine (string settingsFile)
 		{
+			Init();
 		}
 		
 		public AudioEngine (string settingsFile, TimeSpan lookAheadTime, string rendererId)
 		{
-		}
-		
-		public void Update ()
-		{
-			// TODO throw new NotImplementedException ();
+			Init();
 		}
 		
 		#region IDisposable implementation
-		public void Dispose ()
-		{
-			throw new NotImplementedException ();
-		}
+	    public void Dispose() 
+	    {
+	        Dispose(true);
+	
+	        // Use SupressFinalize in case a subclass
+	        // of this type implements a finalizer.
+	        GC.SuppressFinalize(this);      
+	    }
+	
+	    protected virtual void Dispose(bool disposing)
+	    {
+	        // If you need thread safety, use a lock around these 
+	        // operations, as well as in your methods that use the resource.
+	        if (!_disposed)
+	        {
+	            if (disposing) {
+					Cleanup();
+	            }
+	
+	            // Indicate that the instance has been disposed.
+	            _disposed = true;
+				
+				if(currentInstance == this)
+				{
+					currentInstance = null;
+				}
+
+				// managed resource cleanup here.
+	        }
+	    }		
 		#endregion
 	}
 }
