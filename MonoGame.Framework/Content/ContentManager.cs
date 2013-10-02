@@ -73,13 +73,15 @@ namespace Microsoft.Xna.Framework.Content
             Dispose(false);
         }
 
-        public ContentManager(IServiceProvider serviceProvider)
+        public ContentManager (IServiceProvider serviceProvider)
         {
-            if (serviceProvider == null)
-            {
-                throw new ArgumentNullException("serviceProvider");
+            if (serviceProvider == null) {
+                throw new ArgumentNullException ("serviceProvider");
             }
             this.serviceProvider = serviceProvider;
+#if RESOURCE_TRACKERS
+            lastUnload = DateTime.Now.Ticks;
+#endif
         }
 
         public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
@@ -94,6 +96,9 @@ namespace Microsoft.Xna.Framework.Content
             }
             this.RootDirectory = rootDirectory;
             this.serviceProvider = serviceProvider;
+#if RESOURCE_TRACKERS
+            lastUnload = DateTime.Now.Ticks;
+#endif
         }
 
         public void Dispose()
@@ -371,11 +376,23 @@ namespace Microsoft.Xna.Framework.Content
 		}
             loadedAssets.Add(originalAssetName, asset);
 
+            //GC.GetTotalMemory(true);
+            //var memend = currentProcess.WorkingSet64;
+
+            //Console.WriteLine("mem: " + assetName + ", " + (memend -memstart).ToString());
+
             return (T)result;
         }
 
+#if RESOURCE_TRACKERS
+        private long lastUnload;
+#endif
         public virtual void Unload()
         {
+#if RESOURCE_TRACKERS
+            PrintUnusedResourceSinceLastUnload();
+            lastUnload = DateTime.Now.Ticks;
+#endif
             foreach (IDisposable asset in disposableAssets)
             {
                 asset.Dispose();
@@ -403,6 +420,67 @@ namespace Microsoft.Xna.Framework.Content
                 return this.serviceProvider;
             }
         }
+
+
+#if RESOURCE_TRACKERS
+        public void PrintUnusedResourcesSince(long time)
+        {
+            var unusedNum = 0;
+            foreach(var r in loadedAssets.Values)
+            {
+                var known = false;
+                var t = r as Texture2D;
+                if(t != null)
+                {
+                    known = true;
+                    if(t.lastUsed < time)
+                    {
+                        Console.WriteLine("Unused: " + t.Name);
+                        unusedNum++;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Used: " + t.Name);
+                    }
+                }
+
+                var s = r as SoundEffect;
+                if(s != null)
+                {
+                    known = true;
+                    long maxUsed = 0;
+                    foreach(var i in s.attachedInstances)
+                    {
+                        maxUsed = Math.Max (maxUsed, i.lastUsed);
+                    }
+                    if(maxUsed < time)
+                    {
+                        Console.WriteLine("Unused: " + s.Name);
+                        unusedNum++;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Used: " + s.Name);
+                    }
+                }
+
+                if(!known)
+                {
+                    Console.WriteLine("unknown: " + r.ToString());
+                }
+
+            }
+
+            Console.WriteLine("Unused Count:" + unusedNum);
+        }
+
+        public void PrintUnusedResourceSinceLastUnload()
+        {
+            PrintUnusedResourcesSince(lastUnload);
+        }
+#endif
+
+
     }
 }
 
