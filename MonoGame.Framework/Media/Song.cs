@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Media
     public class Song : IEquatable<Song>, IDisposable
     {
 		private Sound _sound;
-		private string _name;
+		public string _name;
 		private int _playCount;
 		
 		internal Song(string fileName)
@@ -60,6 +60,12 @@ namespace Microsoft.Xna.Framework.Media
 		public void Dispose()
         {
 			_sound.Dispose();
+        }
+
+        public void Reload()
+        {
+            _sound.Dispose();
+            _sound = new Sound(_name, 1.0f, true);
         }
 		
 		public bool Equals(Song song) 
@@ -97,7 +103,7 @@ namespace Microsoft.Xna.Framework.Media
 		  return ! (song1 == song2);
 		}
 		
-		internal void Play()
+		public void Play()
 		{			
 			if ( _sound != null )
 			{
@@ -122,7 +128,7 @@ namespace Microsoft.Xna.Framework.Media
 			}
         }
 		
-		internal void Stop()
+		public void Stop()
 		{
 			if ( _sound != null )
 			{
@@ -155,7 +161,7 @@ namespace Microsoft.Xna.Framework.Media
 			}
 		}
 		
-		internal float Volume
+		public float Volume
 		{
 			get
 			{
@@ -258,6 +264,16 @@ namespace Microsoft.Xna.Framework.Media
 				return 0;
             }
         }
+
+
+        public bool Playing
+        {
+            get
+            {
+                return _sound.Playing;
+            }
+        }
+   
     }
 }
 
