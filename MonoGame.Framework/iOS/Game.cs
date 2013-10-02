@@ -288,12 +288,13 @@ namespace Microsoft.Xna.Framework
 			_vp.Height = manager.PreferredBackBufferHeight;
 			
 			GraphicsDevice.Viewport = _vp;	
-			
-			if(this._isFixedTimeStep)
+
+            // here
+			/*if(this._isFixedTimeStep)
 			{
 				_view.Run(FramesPerSecond / ( FramesPerSecond * TargetElapsedTime.TotalSeconds ) );	
 			}
-			else
+			else*/ 
 			{
 				_view.Run ();
 			}

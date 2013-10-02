@@ -60,6 +60,7 @@ using OpenTK.Graphics.ES20;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Graphics;
+using System.Threading;
 #endregion Using Statements
 
 namespace Microsoft.Xna.Framework
@@ -392,8 +393,15 @@ namespace Microsoft.Xna.Framework
 			
 		}
 		
+
+        private DateTime _lastSwap;
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
+            PerformanceCounter.EndMensure("!OnRenderFrame");
+            PerformanceCounter.BeginMensure("OnRenderFrame");
+
+            if(inBackground) 
+                return;
 			base.OnRenderFrame(e);
 			
 			MakeCurrent();
@@ -401,18 +409,77 @@ namespace Microsoft.Xna.Framework
 			// This code was commented to make the code base more iPhone like.
 			// More speed testing is required, to see if this is worse or better
 			// game.DoStep();	
-			
 			if (game != null )
 			{
 				_nowDraw = DateTime.Now;
+                //PerformanceCounter.Event ("Now", (int)_nowDraw.Millisecond);
 				_drawGameTime.Update(_nowDraw - _lastDraw);
             	_lastDraw = _nowDraw;
             	game.DoDraw(_drawGameTime);
 			}
-						
+			
+            
+            //PerformanceCounter.Event("SwapBuffers", true);
+            PerformanceCounter.BeginMensure("SwapBuffers");
+
+            if(game.IsFixedTimeStep)
+            {
+                var now = DateTime.Now;
+                var elapsed = now - _lastSwap;
+                var remainder = (game.TargetElapsedTime - elapsed);
+                if(remainder.TotalMilliseconds > 0)
+                {
+                    _lastSwap = now + remainder; // don't measure when swap actually happened, count when it was supposed to
+                                                 // allow for drift if frame is a bit too slow.
+                    Thread.Sleep(remainder);
+                }
+                else
+                {
+                    _lastSwap = now;
+                }
+            }
+
 			SwapBuffers();
+            //PerformanceCounter.Event("EndSwap", true);
+
+
+            PerformanceCounter.EndMensure("SwapBuffers");
+
+         /*   var cc = GC.CollectionCount(0);
+            if(cc != lastCollectCount0)
+            {
+                Console.WriteLine("Collect0!");
+                lastCollectCount0 = cc;
+            }
+            cc = GC.CollectionCount(1);
+            if(cc != lastCollectCount1)
+            {
+                Console.WriteLine("Collect1!");
+                lastCollectCount1 = cc;
+            }
+            cc = GC.CollectionCount(2);
+            if(cc != lastCollectCount2)
+            {
+                Console.WriteLine("Collect2!");
+                lastCollectCount2 = cc;
+            }
+            cc = GC.CollectionCount(3);
+            if(cc != lastCollectCount3)
+            {
+                Console.WriteLine("Collect3!");
+                lastCollectCount3 = cc;
+            }*/
+
+             PerformanceCounter.EndMensure("OnRenderFrame");
+            PerformanceCounter.BeginMensure("!OnRenderFrame");
 		}
+
+     /*   private int lastCollectCount0 = 0;
+        private int lastCollectCount1 = 0;
+        private int lastCollectCount2 = 0;
+        private int lastCollectCount3 = 0;*/
 		
+
 		protected override void OnResize(EventArgs e)
 		{
 			base.OnResize(e);
@@ -430,6 +497,18 @@ namespace Microsoft.Xna.Framework
 		
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{			
+/*            if(game.IsFixedTimeStep)
+            {
+                var elapsed = DateTime.Now - _lastUpdate;
+                var remainder = (game.TargetElapsedTime - elapsed);
+                if(remainder.TotalMilliseconds > 0)
+                {
+                    //PerformanceCounter.Event("Delay", (int)remainder.TotalMilliseconds);
+                    Thread.Sleep(remainder);
+                    //PerformanceCounter.Event("DelayDone", (int)remainder.TotalMilliseconds);
+                }
+            }
+  */          
 			base.OnUpdateFrame(e);	
 			
 			if (game != null )
@@ -692,6 +771,19 @@ namespace Microsoft.Xna.Framework
 		public event EventHandler<EventArgs> OrientationChanged;
 		public event EventHandler ClientSizeChanged;
 		public event EventHandler ScreenDeviceNameChanged;
+        
+        
+        private bool inBackground = false;
+        public void OnDidEnterBackground()
+        {
+            inBackground = true;
+        }
+       
+        public void OnWillEnterForeground()
+        {
+            inBackground = false;
+        }
+
     }
 }
 
