@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework
 		
 		delegate void InitialiseGameComponentsDelegate();
 		
-		public Game()
+		public Game(UIViewController viewController = null)
         {           
 			// Initialize collections
 			_services = new GameServiceContainer();
@@ -94,7 +94,12 @@ namespace Microsoft.Xna.Framework
 			_gameComponentCollection.ComponentAdded += Handle_gameComponentCollectionComponentAdded;
 
 			//Create a full-screen window
-			_mainWindow = new UIWindow (UIScreen.MainScreen.Bounds);			
+			_mainWindow = new UIWindow (UIScreen.MainScreen.Bounds);	
+            if(viewController != null)
+            {
+                _mainWindow.RootViewController = viewController;
+            }
+
 			_view = new GameWindow();
 			GameWindow.game = this;			
 			_mainWindow.Add(_view);							
@@ -360,12 +365,21 @@ namespace Microsoft.Xna.Framework
 				_isFixedTimeStep = value;
 			}
         }
-
+  
+        // should really be called View instead of window.
         public GameWindow Window
         {
             get
             {
                 return _view;
+            }
+        }
+        
+        public UIWindow MainWindow
+        {
+            get
+            {
+                return _mainWindow;
             }
         }
 		
