@@ -533,14 +533,14 @@ namespace Microsoft.Xna.Framework
 		#endregion
 				
 		#region UIVIew Methods	
-		[Export("LongPressGestureRecognizer")]
+		[Export("LongPressGestureRecognizer:")]
 		public void LongPressGestureRecognizer (UILongPressGestureRecognizer sender)
 		{
 			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Hold, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
 		}
 		
 		
-		[Export("PanGestureRecognizer")]
+		[Export("PanGestureRecognizer:")]
 		public void PanGestureRecognizer (UIPanGestureRecognizer sender)
 		{
 			if (sender.State==UIGestureRecognizerState.Ended || sender.State==UIGestureRecognizerState.Cancelled || sender.State==UIGestureRecognizerState.Failed)
@@ -549,26 +549,26 @@ namespace Microsoft.Xna.Framework
 				TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.FreeDrag, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2(0,0), new Vector2 (sender.TranslationInView(sender.View)), new Vector2(0,0)));
 		}
 			
-		[Export("PinchGestureRecognizer")]
+		[Export("PinchGestureRecognizer:")]
 		public void PinchGestureRecognizer (UIPinchGestureRecognizer sender)
 		{
 			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Pinch, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationOfTouch(0,sender.View)), new Vector2 (sender.LocationOfTouch(1,sender.View)), new Vector2(0,0), new Vector2(0,0)));
 		}
 		
 		
-		[Export("RotationGestureRecognizer")]
+		[Export("RotationGestureRecognizer:")]
 		public void RotationGestureRecognizer (UIRotationGestureRecognizer sender)
 		{
 			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Rotation, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));
 		}
 		
-		[Export("SwipeGestureRecognizer")]
+		[Export("SwipeGestureRecognizer:")]
 		public void SwipeGestureRecognizer (UISwipeGestureRecognizer sender)
 		{
 			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Flick, new TimeSpan(_nowUpdate.Ticks), new Vector2 (sender.LocationInView (sender.View)), new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));		
 		}
 		
-		[Export("TapGestureRecognizer")]
+		[Export("TapGestureRecognizer:")]
 		public void TapGestureRecognizer (UITapGestureRecognizer sender)
 		{
 			TouchPanel.GestureList.Enqueue(new GestureSample(GestureType.Tap, new TimeSpan(_nowUpdate.Ticks), translatedTouchPosition, new Vector2 (sender.LocationInView (sender.View)), new Vector2(0,0), new Vector2(0,0)));

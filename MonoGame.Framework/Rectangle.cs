@@ -212,16 +212,6 @@ namespace Microsoft.Xna.Framework
         }
 
 
-        public void Intersects(ref Rectangle value, out bool result)
-        {
-            result = !(value.Left > Right
-                     || value.Right < Left
-                     || value.Top > Bottom
-                     || value.Bottom < Top
-                    );
-
-        }
-
         public static Rectangle Intersect(Rectangle value1, Rectangle value2)
         {
             Rectangle rectangle;

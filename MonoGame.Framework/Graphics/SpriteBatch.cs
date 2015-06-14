@@ -246,6 +246,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			Begin( sortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, Matrix.Identity );			
 		}
 		
+
+        private bool begun = false;
+
 		public void Begin(SpriteSortMode sortMode, BlendState blendState, SamplerState samplerState, DepthStencilState depthStencilState, RasterizerState rasterizerState, Effect effect, Matrix transformMatrix)
 		{
 			_sortMode = sortMode;
@@ -258,10 +261,19 @@ namespace Microsoft.Xna.Framework.Graphics
 			if(effect != null)
 				_effect = effect;
 			_matrix = transformMatrix;
+
+
+            if (begun)
+                throw new Exception ("batch already started");
+            begun = true;
 		}
 		
 		public void End()
 		{
+            if (!begun)
+                throw new Exception ("ended batch not started");
+            begun = false;
+              
 			// OpenGL ES Version 
 #if ANDROID
 			if(GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
@@ -487,6 +499,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				throw new ArgumentException("texture");
 			}
+
+            if (!begun)
+                throw new ArgumentException (" drawn in batch not begun");
 			
 			if ( sourceRectangle.HasValue)
 			{
