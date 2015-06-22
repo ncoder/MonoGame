@@ -1,7 +1,7 @@
 #region License
 /*
 MIT License
-Copyright © 2006 The Mono.Xna Team
+Copyright ï¿½ 2006 The Mono.Xna Team
 
 All rights reserved.
 
@@ -29,7 +29,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Drawing;
+using CoreGraphics;
 
 using OpenTK.Graphics.ES11;
 
@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				imagePtr = Marshal.AllocHGlobal (imageData.Length);
 				Marshal.Copy (imageData, 0, imagePtr, imageData.Length);					
-				ESTexture2D esTexture = new ESTexture2D (imagePtr, surfaceFormat, width, height, new Size (width, height), All.Linear);
+				ESTexture2D esTexture = new ESTexture2D (imagePtr, surfaceFormat, width, height, new CGSize (width, height), All.Linear);
 				texture = new Texture2D (reader.GraphicsDevice, new ESImage (esTexture));
 			}
 			finally 

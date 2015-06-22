@@ -39,13 +39,13 @@ purpose and non-infringement.
 #endregion License
 
 using System;
-using System.Drawing;
+using CoreGraphics;
 using System.Runtime.InteropServices;
 using System.IO;
 
-using MonoTouch.UIKit;
-using MonoTouch.CoreGraphics;
-using MonoTouch.Foundation;
+using UIKit;
+using CoreGraphics;
+using Foundation;
 
 using OpenTK.Graphics.ES11;
 
@@ -55,12 +55,12 @@ namespace Microsoft.Xna.Framework.Graphics
 	internal class ESTexture2D : IDisposable
 	{
 		private uint _name;
-		private Size _size;
+		private CGSize _size;
 		private int _width,_height;
 		private SurfaceFormat _format;
 		private float _maxS,_maxT;
 		
-		public ESTexture2D (IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
+		public ESTexture2D (IntPtr data, SurfaceFormat pixelFormat, int width, int height, CGSize size, All filter)
 		{
 			InitWithData(data,pixelFormat,width,height,size, filter);
 		}
@@ -85,7 +85,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	        bool hasAlpha;
 	        CGImageAlphaInfo info;
 	        CGAffineTransform transform;
-	        Size imageSize;
+	        CGSize imageSize;
 	        SurfaceFormat pixelFormat;
 	        bool sizeToFit = false;
 			
@@ -106,9 +106,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				pixelFormat = SurfaceFormat.Alpha8;
 			}
 	
-			imageSize = new Size(image.Width,image.Height);
+			imageSize = new CGSize(image.Width,image.Height);
 			transform = CGAffineTransform.MakeIdentity();
-			width = imageSize.Width;
+            width = (int)imageSize.Width;
 	
 			if((width != 1) && ((width & (width - 1))!=0)) {
 				i = 1;
@@ -116,7 +116,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					i *= 2;
 				width = i;
 			}
-			height = imageSize.Height;
+            height = (int)imageSize.Height;
 			if((height != 1) && ((height & (height - 1))!=0)) {
 				i = 1;
 				while((sizeToFit ? 2 * i : i) < height)
@@ -153,7 +153,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 				
 
-			context.ClearRect(new RectangleF(0,0,width,height));
+			context.ClearRect(new CGRect(0,0,width,height));
  			context.TranslateCTM(0, height - imageSize.Height);
 			
 			if (!transform.IsIdentity)
@@ -161,7 +161,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				context.ConcatCTM(transform);
 			}
 			
-			context.DrawImage(new RectangleF(0, 0, image.Width, image.Height), image);
+			context.DrawImage(new CGRect(0, 0, image.Width, image.Height), image);
 			
 			//Convert "RRRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA" to "RRRRRGGGGGGBBBBB"
 			/*
@@ -279,7 +279,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				pointer = Marshal.AllocHGlobal(length);
 				Marshal.Copy (b, 0, pointer, length);
-	            result = new ESTexture2D(pointer,SurfaceFormat.Dxt3,width,height,new Size(width,height),All.Linear);
+	            result = new ESTexture2D(pointer,SurfaceFormat.Dxt3,width,height,new CGSize(width,height),All.Linear);
 			}
 			finally 
 			{		
@@ -325,9 +325,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 
-		public void InitWithData(IntPtr data, SurfaceFormat pixelFormat, int width, int height, Size size, All filter)
+		public void InitWithData(IntPtr data, SurfaceFormat pixelFormat, int width, int height, CGSize size, All filter)
 		{		
-			GL.GenTextures(1,ref _name);
+			GL.GenTextures(1,out _name);
 			GL.BindTexture(All.Texture2D, _name);
 			GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int) filter);
 			GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int) filter);
@@ -363,8 +363,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			_width = width;
 			_height = height;
 			_format = pixelFormat;
-			_maxS = size.Width / (float)width;
-			_maxT = size.Height / (float)height;
+            _maxS = (float)size.Width / (float)width;
+            _maxT = (float)size.Height / (float)height;
 		}
 		
 		public void DrawAtPoint(Vector2 point)
@@ -394,7 +394,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.DrawArrays(All.TriangleStrip, 0, 4);
 		}
 		
-		public Size ContentSize
+		public CGSize ContentSize
 		{
 			get 
 			{

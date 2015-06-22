@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -55,7 +55,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
             All11 bufferUsage = (_bufferUsage == BufferUsage.WriteOnly) ? All11.StaticDraw : All11.DynamicDraw;
 			
-            GL11.GenBuffers(1, ref _bufferStore);
+            GL11.GenBuffers(1, out _bufferStore);
             GL11.BindBuffer(All11.ArrayBuffer, _bufferStore);
             GL11.BufferData<T>(All11.ArrayBuffer, (IntPtr)_size, (T[])_buffer, bufferUsage);			
 		}
@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public void Dispose ()
 		{
-			GL11.GenBuffers(0, ref _bufferStore);
+			GL11.GenBuffers(0, out _bufferStore);
 		}
     }
 	

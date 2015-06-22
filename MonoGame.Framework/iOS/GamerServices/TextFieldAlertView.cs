@@ -1,7 +1,7 @@
-using System.Drawing;
+using CoreGraphics;
 
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			this.AddButton("Cancel");
 			this.AddButton("Ok");
 			// shift the control up so the keyboard won't hide the control when activated.
-			this.Transform = MonoTouch.CoreGraphics.CGAffineTransform.MakeTranslation(0f, 110f);
+			this.Transform = CoreGraphics.CGAffineTransform.MakeTranslation(0f, 110f);
 		}
 		
 		public string EnteredText 
@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 		private UITextField ComposeTextFieldControl(bool secureTextEntry)
 		{
-			UITextField textField = new UITextField (new System.Drawing.RectangleF(12f, 45f, 260f, 25f));
+			UITextField textField = new UITextField (new CGRect(12f, 45f, 260f, 25f));
 			textField.BackgroundColor = UIColor.White;
 			textField.UserInteractionEnabled = true;
 			textField.AutocorrectionType = UITextAutocorrectionType.No;
@@ -87,9 +87,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 		
 		private void AdjustControlSize()
 		{
-			float tfExtH = _tf.Frame.Size.Height + 16.0f;
+            float tfExtH = (float)_tf.Frame.Size.Height + 16.0f;
 			
-			RectangleF frame = new RectangleF(this.Frame.X, 
+			CGRect frame = new CGRect(this.Frame.X, 
 			                                  this.Frame.Y - tfExtH/2,
 			                                  this.Frame.Size.Width,
 			                                  this.Frame.Size.Height + tfExtH);
@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			{
 				if(view is UIControl)
 				{
-					view.Frame = new RectangleF(view.Frame.X, 
+					view.Frame = new CGRect(view.Frame.X, 
 					                            view.Frame.Y + tfExtH,
 					                            view.Frame.Size.Width, 
 					                            view.Frame.Size.Height);

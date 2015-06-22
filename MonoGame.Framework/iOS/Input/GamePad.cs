@@ -42,9 +42,9 @@
 	using System;
 	using Microsoft.Xna.Framework.Graphics;
 	using OpenTK.Graphics.ES11;
-	using MonoTouch.UIKit;
+	using UIKit;
 	using System.Collections.Generic;
-	using MonoTouch.AudioToolbox;
+	using AudioToolbox;
 	
 	﻿namespace Microsoft.Xna.Framework.Input
 	{
@@ -182,7 +182,7 @@
 				return  thumbRect.Contains(location); 
 			}
 			
-			internal void TouchesBegan( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e, GameWindow window)
+			internal void TouchesBegan( Foundation.NSSet touches, UIKit.UIEvent e, GameWindow window)
 			{
 				// Reset State		
 				//Reset();
@@ -231,12 +231,12 @@
 				}
 			}
 			
-			internal void TouchesCancelled( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e)
+			internal void TouchesCancelled( Foundation.NSSet touches, UIKit.UIEvent e)
 			{
 				// do nothing
 			}
 			
-			internal void TouchesMoved( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e,GameWindow window)
+			internal void TouchesMoved( Foundation.NSSet touches, UIKit.UIEvent e,GameWindow window)
 			{
 				UITouch []touchesArray = touches.ToArray<UITouch>();
 				foreach(UITouch touch in touchesArray)
@@ -344,7 +344,7 @@
 				}	
 			}
 			
-			internal void TouchesEnded( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e, GameWindow window)
+			internal void TouchesEnded( Foundation.NSSet touches, UIKit.UIEvent e, GameWindow window)
 			{						
 				UITouch []touchesArray = touches.ToArray<UITouch>();
 				foreach(UITouch touch in touchesArray)

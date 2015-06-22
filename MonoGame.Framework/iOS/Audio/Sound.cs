@@ -33,8 +33,8 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 
 using MonoTouch;
-using MonoTouch.Foundation;	
-using MonoTouch.AVFoundation;
+using Foundation;	
+using AVFoundation;
 
 namespace Microsoft.Xna.Framework.Audio
 {	

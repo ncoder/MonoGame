@@ -41,8 +41,8 @@
 using System;
 using System.IO;
 
-using MonoTouch.MediaPlayer;
-using MonoTouch.Foundation;
+using MediaPlayer;
+using Foundation;
 
 using Microsoft.Xna.Framework.Graphics;
 
@@ -115,7 +115,7 @@ namespace Microsoft.Xna.Framework.Media
 			_view.MoviePlayer.PrepareToPlay();
 			
 			Vector4 color = BackgroundColor.ToEAGLColor();
-			_view.MoviePlayer.BackgroundColor = new MonoTouch.UIKit.UIColor(color.X,color.Y,color.Z,color.W);
+			_view.MoviePlayer.BackgroundColor = new UIKit.UIColor(color.X,color.Y,color.Z,color.W);
 		}
 		
 		internal MPMoviePlayerViewController MovieView

@@ -44,9 +44,10 @@ using System.Globalization;
 #region Statement
 ﻿using System;
 
-using MonoTouch.Foundation;
-using MonoTouch.GameKit;
-using MonoTouch.UIKit;
+using Foundation;
+using GameKit;
+using UIKit;
+using MonoGame.Framework.iOS;
 
 #endregion Statement
 
@@ -258,7 +259,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 																if ( ac.Key == a.Identifier )
 																{
 																	ac.IsEarned = a.Completed;
-																	ac.EarnedDateTime = a.LastReportedDate;
+                                                                    ac.EarnedDateTime = a.LastReportedDate.NSDateToDateTime();
 																}
 															}															
 														}

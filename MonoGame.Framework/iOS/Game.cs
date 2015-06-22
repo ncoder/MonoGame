@@ -41,11 +41,11 @@ purpose and non-infringement.
 using System;
 using System.IO;
 
-using MonoTouch.CoreAnimation;
-using MonoTouch.CoreFoundation;
-using MonoTouch.Foundation;
-using MonoTouch.OpenGLES;
-using MonoTouch.UIKit;
+using CoreAnimation;
+using CoreFoundation;
+using Foundation;
+using OpenGLES;
+using UIKit;
 
 using OpenTK.Graphics;
 
@@ -55,7 +55,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using System.Linq;
-using MonoTouch.CoreGraphics;
+using CoreGraphics;
 
 namespace Microsoft.Xna.Framework
 {
@@ -305,7 +305,7 @@ namespace Microsoft.Xna.Framework
 			}
 			_view.MainContext = _view.EAGLContext;
 			_view.ShareGroup = _view.MainContext.ShareGroup;
-			_view.BackgroundContext = new MonoTouch.OpenGLES.EAGLContext(_view.ContextRenderingApi, _view.ShareGroup);
+			_view.BackgroundContext = new OpenGLES.EAGLContext(_view.ContextRenderingApi, _view.ShareGroup);
 			
 			//Show the window			
 			_mainWindow.MakeKeyAndVisible();	
@@ -537,7 +537,7 @@ namespace Microsoft.Xna.Framework
 		{
 			return self;
 			// calculate the size of the rotated view's containing box for our drawing space
-			UIView rotatedViewBox = new UIView(new System.Drawing.RectangleF(0,0,self.Size.Width * self.CurrentScale,self.Size.Height*self.CurrentScale));
+			UIView rotatedViewBox = new UIView(new CGRect(0,0,self.Size.Width * self.CurrentScale,self.Size.Height*self.CurrentScale));
 			CGAffineTransform t = CGAffineTransform.MakeRotation(MathHelper.ToRadians(degrees));
 			rotatedViewBox.Transform = t;
 			var size = rotatedViewBox.Frame.Size;
@@ -553,7 +553,7 @@ namespace Microsoft.Xna.Framework
 
    			// Now, draw the rotated/scaled image into the context
 			bitmap.ScaleCTM(1,-1);
-			bitmap.DrawImage(new System.Drawing.RectangleF(-self.Size.Width*self.CurrentScale /2,-self.Size.Height*self.CurrentScale/2,self.Size.Width*self.CurrentScale,self.Size.Height*self.CurrentScale),self.CGImage);
+			bitmap.DrawImage(new CGRect(-self.Size.Width*self.CurrentScale /2,-self.Size.Height*self.CurrentScale/2,self.Size.Width*self.CurrentScale,self.Size.Height*self.CurrentScale),self.CGImage);
    			UIImage newImage = UIGraphics.GetImageFromCurrentImageContext();
 			UIGraphics.EndImageContext();
    			return newImage;	

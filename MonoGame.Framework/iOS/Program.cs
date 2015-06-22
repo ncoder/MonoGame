@@ -40,8 +40,8 @@
 // 
 using System;
 
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
 
 using Microsoft.Xna;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework
 		
 		public override void DidEnterBackground (UIApplication application)
 		{
-			ourTask = application.BeginBackgroundTask(delegate
+            ourTask = (int)application.BeginBackgroundTask(delegate
 			{    //this is the action that will run when the task expires
 				if (ourTask != 0) //this check is because we want to avoid ending the same task twice
 				{
@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework
 		
 		public override void WillEnterForeground (UIApplication application)
 		{
-			ourTask = application.BeginBackgroundTask(delegate
+            ourTask = (int)application.BeginBackgroundTask(delegate
 			{    //this is the action that will run when the task expires
 				if (ourTask != 0) //this check is because we want to avoid ending the same task twice
 				{

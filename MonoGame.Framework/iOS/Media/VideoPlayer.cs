@@ -41,8 +41,8 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
-using MonoTouch.MediaPlayer;
-using MonoTouch.Foundation;
+using MediaPlayer;
+using Foundation;
 
 namespace Microsoft.Xna.Framework.Media
 {

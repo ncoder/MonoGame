@@ -39,9 +39,9 @@ purpose and non-infringement.
 #endregion License
 
 using System;
-using MonoTouch.UIKit;
+using UIKit;
 using OpenTK.Graphics.ES11;
-using System.Drawing;
+using CoreGraphics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public ESImage(int width, int height)
 		{
-			texture = new ESTexture2D(IntPtr.Zero,SurfaceFormat.Color,width,height,new Size(width,height),All.Linear);
+			texture = new ESTexture2D(IntPtr.Zero,SurfaceFormat.Color,width,height,new CGSize(width,height),All.Linear);
 			imageWidth = textureWidth = width;
 			imageHeight = textureHeight = height;
 			texWidthRatio = 1.0f / width;
@@ -91,8 +91,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public void Initialize( float scale )
 		{
-			imageWidth = texture.ContentSize.Width;
-			imageHeight = texture.ContentSize.Height;
+            imageWidth = (int)texture.ContentSize.Width;
+            imageHeight = (int)texture.ContentSize.Height;
 			textureWidth = (int)(texture.PixelsWide/scale);
 			textureHeight = (int)(texture.PixelsHigh/scale);
 			texWidthRatio = 1.0f / (float)textureWidth;

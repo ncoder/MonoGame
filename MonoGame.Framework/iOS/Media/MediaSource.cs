@@ -41,7 +41,7 @@
 
 using System;
 using System.Collections.Generic;
-using MonoTouch.UIKit;
+using UIKit;
 
 namespace Microsoft.Xna.Framework.Media
 {

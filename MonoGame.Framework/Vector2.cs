@@ -27,7 +27,7 @@ SOFTWARE.
 
 using System;
 using System.Text;
-using System.Drawing;
+using CoreGraphics;
 using System.Globalization;
 
 namespace Microsoft.Xna.Framework
@@ -79,16 +79,22 @@ namespace Microsoft.Xna.Framework
 
         #region Constructors
 
+        public Vector2(nfloat x, nfloat y)
+        {
+            this.X = (float)x;
+            this.Y = (float)y;
+        }
+
         public Vector2(float x, float y)
         {
             this.X = x;
             this.Y = y;
         }
 		 
-		public Vector2(PointF value)
+		public Vector2(CGPoint value)
         {
-            this.X = value.X;
-            this.Y = value.Y;
+            this.X = (float)value.X;
+            this.Y = (float)value.Y;
         }
 
         public Vector2(float value)

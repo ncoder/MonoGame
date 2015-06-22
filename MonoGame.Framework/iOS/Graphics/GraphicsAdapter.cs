@@ -42,7 +42,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-using MonoTouch.UIKit;
+using UIKit;
 
 namespace Microsoft.Xna.Framework.Graphics
 {

@@ -1,4 +1,4 @@
-﻿#if !ANDROID && !IOS
+#if !ANDROID && !IOS
 #define IS_MAC_AVAILABLE
 #endif
 

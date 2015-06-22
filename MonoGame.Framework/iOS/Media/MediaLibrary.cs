@@ -41,7 +41,7 @@
 using System;
 using System.Collections.Generic;
 
-using MonoTouch.MediaPlayer;
+using MediaPlayer;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -105,7 +105,7 @@ namespace Microsoft.Xna.Framework.Media
 				{
 					_playLists = new PlaylistCollection();
 					
-					MPMediaQuery playlists = new MPMediaQuery();
+/*					MPMediaQuery playlists = new MPMediaQuery();
 					playlists.GroupingType = MPMediaGrouping.Playlist; 
 					for (int i=0;i<playlists.Collections.Length;i++)
 					{
@@ -118,7 +118,7 @@ namespace Microsoft.Xna.Framework.Media
 							list.Duration += time;
 						}
 						_playLists.Add(list);
-					}
+					}*/
 				}
 				return _playLists;
             }

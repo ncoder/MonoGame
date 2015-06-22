@@ -40,7 +40,7 @@ purpose and non-infringement.
 
 using System;
 using System.Runtime.CompilerServices;
-using MonoTouch.UIKit;
+using UIKit;
 
 ﻿namespace Microsoft.Xna.Framework
 {

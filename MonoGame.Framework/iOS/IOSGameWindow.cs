@@ -40,14 +40,14 @@ purpose and non-infringement.
 
 #region Using Statements
 using System;
-using System.Drawing;
+using CoreGraphics;
 using System.Collections.Generic;
 
-using MonoTouch.CoreAnimation;
-using MonoTouch.Foundation;
-using MonoTouch.ObjCRuntime;
-using MonoTouch.OpenGLES;
-using MonoTouch.UIKit;
+using CoreAnimation;
+using Foundation;
+using ObjCRuntime;
+using OpenGLES;
+using UIKit;
 
 using OpenTK.Platform.iPhoneOS;
 
@@ -116,7 +116,7 @@ namespace Microsoft.Xna.Framework
 			LayerColorFormat	= EAGLColorFormat.RGBA8;
 			ContentScaleFactor  = UIScreen.MainScreen.Scale;
 			
-			RectangleF rect = UIScreen.MainScreen.Bounds;
+			CGRect rect = UIScreen.MainScreen.Bounds;
 			clientBounds = new Rectangle(0,0,(int) (rect.Width * UIScreen.MainScreen.Scale),(int) (rect.Height * UIScreen.MainScreen.Scale));
 			
 			// Enable multi-touch
@@ -650,35 +650,10 @@ namespace Microsoft.Xna.Framework
 		
 		internal Vector2 GetOffsetPosition(Vector2 position, bool useScale)
 		{
-			Vector2 translatedPosition = position * UIScreen.MainScreen.Scale;
+            Vector2 translatedPosition = position * (float)UIScreen.MainScreen.Scale;
 
-			switch (CurrentOrientation)
-			{
-				case DisplayOrientation.Portrait :
-				{																		
-					break;
-				}
-
-				case DisplayOrientation.LandscapeRight :
-				{				
-					translatedPosition = new Vector2( ClientBounds.Height - translatedPosition.Y, translatedPosition.X );							
-					break;
-				}
-
-				case DisplayOrientation.LandscapeLeft :
-				{							
-					translatedPosition = new Vector2( translatedPosition.Y, ClientBounds.Width - translatedPosition.X );							
-					break;
-				}
-
-				case DisplayOrientation.PortraitUpsideDown :
-				{				
-					translatedPosition = new Vector2( ClientBounds.Width - translatedPosition.X, ClientBounds.Height - translatedPosition.Y );							
-					break;
-				}
-			}
 			if(!useScale)
-				translatedPosition = translatedPosition / UIScreen.MainScreen.Scale;
+                translatedPosition = translatedPosition / (float)UIScreen.MainScreen.Scale;
 			return translatedPosition;
 		}
 		

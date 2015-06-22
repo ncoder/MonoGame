@@ -39,11 +39,11 @@
 // #endregion License
 // 
 using System;
-using MonoTouch.UIKit;
-using MonoTouch.CoreGraphics;
-using MonoTouch.Foundation;
+using UIKit;
+using CoreGraphics;
+using Foundation;
 using System.IO;
-using System.Drawing;
+using CoreGraphics;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 namespace  Microsoft.Xna.Framework.Graphics
@@ -52,7 +52,7 @@ namespace  Microsoft.Xna.Framework.Graphics
 	{
 		public static UIImage FromPdf(string name)
 		{
-			return imageWithPDFNamed(name,UIScreen.MainScreen.Scale);
+            return imageWithPDFNamed(name,(float)UIScreen.MainScreen.Scale);
 		}
 				
 		public static UIImage FromPdf(string name, float width,float height)
@@ -66,13 +66,13 @@ namespace  Microsoft.Xna.Framework.Graphics
 			// PDF pages are numbered starting at page 1
 			CGPDFPage page = doc.GetPage(1);
 			
-			RectangleF box = page.GetBoxRect(CGPDFBox.Crop);
+			CGRect box = page.GetBoxRect(CGPDFBox.Crop);
 			
 			var xScale = (width * UIScreen.MainScreen.Scale) / box.Width;
 			var yScale = (height * UIScreen.MainScreen.Scale) / box.Height;
 			
 			
-			var result = imageWithPDFPage(page,Math.Max(xScale,yScale),CGAffineTransform.MakeIdentity());
+            var result = imageWithPDFPage(page,(float)Math.Max(xScale,yScale),CGAffineTransform.MakeIdentity());
 			return result ;
 		}
 		
@@ -95,9 +95,9 @@ namespace  Microsoft.Xna.Framework.Graphics
 				return null ;
 			}
 		
-			RectangleF box = page.GetBoxRect(CGPDFBox.Crop);
+			CGRect box = page.GetBoxRect(CGPDFBox.Crop);
 			t.Scale(scale,scale);
-			box = new RectangleF(box.Location,new SizeF(box.Size.Width * scale, box.Size.Height * scale));
+			box = new CGRect(box.Location,new CGSize(box.Size.Width * scale, box.Size.Height * scale));
 		
 			var pixelWidth = box.Size.Width ;
 			CGColorSpace cs = CGColorSpace.CreateDeviceRGB() ;

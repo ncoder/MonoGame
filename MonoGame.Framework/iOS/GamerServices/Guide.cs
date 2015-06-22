@@ -46,9 +46,9 @@ using System.Linq;
 using System.Threading;
 using System.Runtime.Remoting.Messaging;
 
-using MonoTouch.UIKit;
-using MonoTouch.Foundation;
-using MonoTouch.GameKit;
+using UIKit;
+using Foundation;
+using GameKit;
 
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
@@ -182,7 +182,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 									isKeyboardInputShowing = false;
 								};
 				
-				myAlertView.Transform = MonoTouch.CoreGraphics.CGAffineTransform.MakeTranslation (0f, 110f);
+				myAlertView.Transform = CoreGraphics.CGAffineTransform.MakeTranslation (0f, 110f);
 				
 				GetInvokeOnMainThredObj().InvokeOnMainThread(delegate {    
 	       		 		myAlertView.Show();  
@@ -259,12 +259,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 				alert.Message = text;
 				alert.Dismissed += delegate(object sender, UIButtonEventArgs e) 
 								{ 
-									result = e.ButtonIndex;
+                                    result = (int)e.ButtonIndex;
 									isMessageBoxShowing = false;
 								};
 				alert.Clicked += delegate(object sender, UIButtonEventArgs e) 
 								{ 
-									result = e.ButtonIndex; 
+                                    result = (int)e.ButtonIndex; 
 									isMessageBoxShowing = false;
 								};
 				
@@ -369,7 +369,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			    {
 					leaderboardController.DidFinish += delegate(object sender, EventArgs e) 
 					{
-						leaderboardController.DismissModalViewControllerAnimated(true);
+						leaderboardController.DismissModalViewController(true);
 						isVisible = false;
 						TouchPanel.EnabledGestures=prevGestures;
  					};
@@ -412,7 +412,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			    {					
 					achievementController.DidFinish += delegate(object sender, EventArgs e) 
 					{									 
-						achievementController.DismissModalViewControllerAnimated(true);
+						achievementController.DismissModalViewController(true);
 						isVisible = false;
 						TouchPanel.EnabledGestures=prevGestures;
 					};

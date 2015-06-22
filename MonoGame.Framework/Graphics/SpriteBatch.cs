@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if ANDROID
 			if(GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
 #else
-			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
+			if(GraphicsDevice.OpenGLESVersion == OpenGLES.EAGLRenderingAPI.OpenGLES2)
 #endif
 				InitGL20();
 		}
@@ -145,7 +145,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	                GL20.GetProgram (program, ALL20.InfoLogLength, ref length);
 	                if (length > 0) {
 	                    var log = new StringBuilder (length);
-	                    GL20.GetProgramInfoLog (program, length, ref length, log);
+	                    GL20.GetProgramInfoLog (program, length, out length, log);
 	                    Console.WriteLine ("GL2" + log.ToString ());
 	                }
 	
@@ -197,7 +197,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	                GL20.GetShader (shader, ALL20.InfoLogLength, ref length);
 	                if (length > 0) {
 	                    var log = new StringBuilder (length);
-	                    GL20.GetShaderInfoLog (shader, length, ref length, log);
+	                    GL20.GetShaderInfoLog (shader, length, out length, log);
 	                    Console.WriteLine("GL2" + log.ToString ());
 	                }
 	
@@ -278,7 +278,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if ANDROID
 			if(GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
 #else
-			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
+			if(GraphicsDevice.OpenGLESVersion == OpenGLES.EAGLRenderingAPI.OpenGLES2)
 #endif
 				EndGL20();
 			else
@@ -389,7 +389,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					break;
 				}
 				
-				case DisplayOrientation.LandscapeLeft:
+				case DisplayOrentation.LandscapeLeft:
 				case DisplayOrientation.PortraitUpsideDown:
                 default:
 				{
@@ -402,15 +402,15 @@ namespace Microsoft.Xna.Framework.Graphics
 	        {
 				case DisplayOrientation.LandscapeLeft:
                 {
-					GL11.Rotate(-90, 0, 0, 1);
-					GL11.Ortho(0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width, 0, -1, 1);
+					//GL11.Rotate(-90, 0, 0, 1);
+                    GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 					break;
 				}
 				
 				case DisplayOrientation.LandscapeRight:
                 {
-					GL11.Rotate(90, 0, 0, 1);					
-					GL11.Ortho(0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width, 0, -1, 1);
+					//GL11.Rotate(90, 0, 0, 1);					
+                    GL11.Ortho(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, -1, 1);
 					break;
 				}
 				
@@ -438,20 +438,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			
 			GL11.MatrixMode(ALL11.Modelview);			
-			
-#if !ANDROID			
-			// Only swap our viewport if Width is greater than height
-			if ((this.graphicsDevice.Viewport.Width > this.graphicsDevice.Viewport.Height)
-				&& ((this.graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeLeft )
-				|| (this.graphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeRight ) ) )
-			{
-				GL11.Viewport(0, 0, this.graphicsDevice.Viewport.Height, this.graphicsDevice.Viewport.Width);
-			}
-			else
-#endif								
-			{
-				GL11.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
-			}
+							
+			GL11.Viewport(0, 0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height);
 			
 			// Enable Scissor Tests if necessary
 			if ( this.graphicsDevice.RasterizerState.ScissorTestEnable )

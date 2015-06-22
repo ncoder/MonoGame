@@ -1,46 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</ProjectGuid>
-    <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectGuid>{AB122908-5668-4090-B34A-5F627B7550A5}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <Description>XNA implementation for MonoTouch</Description>
-    <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
-    <SynchReleaseVersion>False</SynchReleaseVersion>
-    <ReleaseVersion>1.6</ReleaseVersion>
-    <MtouchSdkVersion>3.0</MtouchSdkVersion>
-    <TargetFrameworkIdentifier>Xamarin.iOS</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
-    <Platform Condition=" '$(Platform)' == '' ">iPhone</Platform>
-    <AssemblyName>MonoGame.Framework</AssemblyName>
+    <RootNamespace>MonoGame.Framework.iOS.bit</RootNamespace>
+    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+    <AssemblyName>MonoGame.Framework.iOS.64bit</AssemblyName>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
-    <DebugSymbols>True</DebugSymbols>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>True</Optimize>
-    <OutputPath>bin\iPhone\Debug</OutputPath>
-    <DefineConstants>DEBUG;IPHONE;PERF_COUNTERS</DefineConstants>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <MtouchDebug>True</MtouchDebug>
-    <MtouchUseArmv7>false</MtouchUseArmv7>
-    <MtouchArch>ARMv7, ARM64</MtouchArch>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
-    <Optimize>True</Optimize>
-    <OutputPath>bin\iPhone\Release</OutputPath>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <DefineConstants>IPHONE</DefineConstants>
-    <MtouchUseArmv7>false</MtouchUseArmv7>
-    <DebugSymbols>True</DebugSymbols>
-    <MtouchArch>ARMv7, ARM64</MtouchArch>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -314,7 +304,6 @@
     <Compile Include="iOS\Media\MediaLibrary.cs" />
     <Compile Include="iOS\Input\Accelerometer.cs" />
     <Compile Include="iOS\Media\Video.cs" />
-    <Compile Include="iOS\Media\VideoPlayer.cs" />
     <Compile Include="iOS\GamerServices\Guide.cs" />
     <Compile Include="iOS\GamerServices\TextFieldAlertView.cs" />
     <Compile Include="iOS\Program.cs" />
@@ -343,6 +332,7 @@
     <Compile Include="Audio\AudioReader.cs" />
     <Compile Include="Audio\OpenALException.cs" />
     <Compile Include="BetterList.cs" />
+    <Compile Include="64bitEx.cs" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
@@ -368,7 +358,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.iOS.csproj">
+    <ProjectReference Include="..\..\..\spunk\extern\MonoGame\ThirdParty\Lidgren.Network\Lidgren.Network.iOS.csproj">
       <Project>{734EAA48-F1CA-481A-B391-0285BC0E8B40}</Project>
       <Name>Lidgren.Network.iOS</Name>
     </ProjectReference>

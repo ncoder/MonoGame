@@ -77,10 +77,10 @@ namespace Microsoft.Xna.Framework.Graphics
 #if ANDROID
 			if(GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
 #else
-			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
+			if(GraphicsDevice.OpenGLESVersion == OpenGLES.EAGLRenderingAPI.OpenGLES2)
 #endif
 			{
-				GL20.GenFramebuffers(1, ref frameBuffer);
+				GL20.GenFramebuffers(1, out frameBuffer);
 			}
 			else
 			{
