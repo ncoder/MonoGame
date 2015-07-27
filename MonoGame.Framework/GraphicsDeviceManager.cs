@@ -62,12 +62,14 @@ namespace Microsoft.Xna.Framework
             {
                 throw new ArgumentNullException("Game Cannot Be Null");
             }
-            
+
 			_game = game;
-			
+
+            var orientation = _game.Window.CurrentOrientation;
+
 			_supportedOrientations = DisplayOrientation.Default;
-			_preferredBackBufferHeight = game.Window.ClientBounds.Height;
-			_preferredBackBufferWidth = game.Window.ClientBounds.Width;
+            _preferredBackBufferHeight = game.Window.ClientBounds.Height;
+            _preferredBackBufferWidth = game.Window.ClientBounds.Width;
 			
             if (game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
             {

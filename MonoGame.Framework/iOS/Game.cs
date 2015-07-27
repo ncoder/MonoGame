@@ -93,21 +93,42 @@ namespace Microsoft.Xna.Framework
 			_gameComponentCollection = new GameComponentCollection();
 			_gameComponentCollection.ComponentAdded += Handle_gameComponentCollectionComponentAdded;
 
-			//Create a full-screen window
-			_mainWindow = new UIWindow (UIScreen.MainScreen.Bounds);	
+            _mainWindow = new UIWindow ( UIScreen.MainScreen.Bounds);    
+
             if(viewController != null)
             {
                 _mainWindow.RootViewController = viewController;
             }
 
-			_view = new GameWindow();
+            FixupRotationIos7 (); // important to get proper _mainWindow bounds right now.
+
+            _view = new GameWindow(_mainWindow.Bounds, UIScreen.MainScreen.Scale);
 			GameWindow.game = this;			
 			_mainWindow.Add(_view);							
+
 					
 			// Initialize GameTime
             _updateGameTime = new GameTime();
             _drawGameTime = new GameTime();  	
 		}
+
+        void FixupRotationIos7()
+        {
+            if (UIScreen.MainScreen.Bounds.Width < UIScreen.MainScreen.Bounds.Height) {
+                //Create a full-screen window, rotation-corrected.
+                _mainWindow.ContentMode = UIViewContentMode.Center;
+
+                if (UIDevice.CurrentDevice.Orientation == UIDeviceOrientation.LandscapeRight ||
+                    UIDevice.CurrentDevice.Orientation == UIDeviceOrientation.Unknown) {
+                    _mainWindow.Transform = CGAffineTransform.MakeRotation (MathHelper.ToRadians (-90));
+                }
+                else if (UIDevice.CurrentDevice.Orientation == UIDeviceOrientation.LandscapeLeft) {
+                    _mainWindow.Transform = CGAffineTransform.MakeRotation (MathHelper.ToRadians (90));
+                }
+                _mainWindow.Bounds = new CGRect(0,0, UIScreen.MainScreen.Bounds.Height, UIScreen.MainScreen.Bounds.Width);
+            } 
+                   
+        }
 		
 		void Handle_gameComponentCollectionComponentAdded (object sender, GameComponentCollectionEventArgs e)
 		{
@@ -130,35 +151,40 @@ namespace Microsoft.Xna.Framework
 		private void ObserveDeviceRotation ()
 		{
 			NSNotificationCenter.DefaultCenter.AddObserver( new NSString("UIDeviceOrientationDidChangeNotification"), (notification) => { 
-			UIDeviceOrientation orientation = UIDevice.CurrentDevice.Orientation;
-				
-			// Calculate supported orientations if it has been left as "default"
-			var gdm = (graphicsDeviceManager as GraphicsDeviceManager);
-            DisplayOrientation supportedOrientations = gdm.SupportedOrientations;
-			
-			if (GraphicsDevice.PresentationParameters.BackBufferWidth != gdm.PreferredBackBufferWidth)
-			{
-				GraphicsDevice.PresentationParameters.BackBufferWidth = gdm.PreferredBackBufferWidth;
-			}
-			
-			if (GraphicsDevice.PresentationParameters.BackBufferHeight != gdm.PreferredBackBufferHeight)
-			{
-				GraphicsDevice.PresentationParameters.BackBufferHeight = gdm.PreferredBackBufferHeight;
 
-			}
-				
-            if ((supportedOrientations & DisplayOrientation.Default) != 0)
-            {
-                if (GraphicsDevice.PresentationParameters.BackBufferWidth > GraphicsDevice.PresentationParameters.BackBufferHeight)
+                FixupRotationIos7();
+
+                FixViewport();
+
+    			UIDeviceOrientation orientation = UIDevice.CurrentDevice.Orientation;
+    				
+    			// Calculate supported orientations if it has been left as "default"
+    			var gdm = (graphicsDeviceManager as GraphicsDeviceManager);
+                DisplayOrientation supportedOrientations = gdm.SupportedOrientations;
+    			
+    			if (GraphicsDevice.PresentationParameters.BackBufferWidth != gdm.PreferredBackBufferWidth)
+    			{
+    				GraphicsDevice.PresentationParameters.BackBufferWidth = gdm.PreferredBackBufferWidth;
+    			}
+    			
+    			if (GraphicsDevice.PresentationParameters.BackBufferHeight != gdm.PreferredBackBufferHeight)
+    			{
+    				GraphicsDevice.PresentationParameters.BackBufferHeight = gdm.PreferredBackBufferHeight;
+
+    			}
+    				
+                if ((supportedOrientations & DisplayOrientation.Default) != 0)
                 {
-                    supportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+                    if (GraphicsDevice.PresentationParameters.BackBufferWidth > GraphicsDevice.PresentationParameters.BackBufferHeight)
+                    {
+                        supportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+                    }
+                    else
+                    {
+                        supportedOrientations = DisplayOrientation.Portrait | DisplayOrientation.PortraitUpsideDown;
+                    }
                 }
-                else
-                {
-                    supportedOrientations = DisplayOrientation.Portrait | DisplayOrientation.PortraitUpsideDown;
-                }
-            }
-				
+    				
 				switch (orientation)
 				{
 					case UIDeviceOrientation.Portrait :
@@ -270,6 +296,22 @@ namespace Microsoft.Xna.Framework
 				}
             }
         }
+
+        public void FixViewport()
+        {
+            
+            Microsoft.Xna.Framework.Graphics.Viewport _vp =
+                new Microsoft.Xna.Framework.Graphics.Viewport();
+
+            // fit gfx viewport to view bounds.
+            _vp.X = this._view.ClientBounds.Left;
+            _vp.Y = this._view.ClientBounds.Top;
+            _vp.Width = this._view.ClientBounds.Width;
+            _vp.Height = this._view.ClientBounds.Height;
+
+            GraphicsDevice.Viewport = _vp;  
+
+        }
 		
         public void Run()
     	{			
@@ -283,17 +325,7 @@ namespace Microsoft.Xna.Framework
 			graphicsDeviceManager.CreateDevice();
 			
 			var manager = Services.GetService (typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager;
-			
-			Microsoft.Xna.Framework.Graphics.Viewport _vp =
-			new Microsoft.Xna.Framework.Graphics.Viewport();
-				
-			_vp.X = 0;
-			_vp.Y = 0;
-			_vp.Width = manager.PreferredBackBufferWidth;
-			_vp.Height = manager.PreferredBackBufferHeight;
-			
-			GraphicsDevice.Viewport = _vp;	
-
+		
             // here
 			/*if(this._isFixedTimeStep)
 			{
@@ -316,7 +348,7 @@ namespace Microsoft.Xna.Framework
 			// Listen out for rotation changes
 			ObserveDeviceRotation();
         }
-		
+
 		internal void DoUpdate(GameTime aGameTime)
 		{
 			if (_isActive)

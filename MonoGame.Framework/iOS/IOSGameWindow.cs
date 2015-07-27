@@ -110,14 +110,13 @@ namespace Microsoft.Xna.Framework
 				
 		#region UIVIew Methods
 
-		public GameWindow() : base (UIScreen.MainScreen.Bounds)
+        public GameWindow(CoreGraphics.CGRect frame, nfloat uiScale) : base (frame)
 		{
 			LayerRetainsBacking = false; 
 			LayerColorFormat	= EAGLColorFormat.RGBA8;
-			ContentScaleFactor  = UIScreen.MainScreen.Scale;
+            ContentScaleFactor  = uiScale;
 			
-			CGRect rect = UIScreen.MainScreen.Bounds;
-			clientBounds = new Rectangle(0,0,(int) (rect.Width * UIScreen.MainScreen.Scale),(int) (rect.Height * UIScreen.MainScreen.Scale));
+            clientBounds = new Rectangle(0,0,(int) (frame.Width * uiScale),(int) (frame.Height * uiScale));
 			
 			// Enable multi-touch
 			MultipleTouchEnabled = true;

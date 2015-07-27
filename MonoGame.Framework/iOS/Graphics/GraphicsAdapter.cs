@@ -58,6 +58,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
+        // danger! width/height can be reversed arbitrarily based on OS! 
         public DisplayMode CurrentDisplayMode
         {
             get
